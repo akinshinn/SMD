@@ -1,4 +1,5 @@
-#top {
-    font-size: xx-large;
-    align-self: center;
+div.top {
+    font-size: large;
+    width: 100px;
+    height: 100px;
 }
