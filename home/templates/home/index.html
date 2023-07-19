@@ -1,30 +1,50 @@
+{% include "home/base.html"%}
 <!DOCTYPE html>
 {% load static %}
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{% static "css/styles.css" %}">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
     <title>SMD</title>
 </head>
 
 <body>
-    <header style="background-color: rgb(227, 230, 232);">
-        <a href="/" class="link logo">
-            <img src="{% static "img/logo.png" %}" class="logo-img">
-            SMD
-        </a>
-        <div class="panel">
-            <nav>
-            <a href="/profile" class="link subpanel">
-                Профиль
-            </a>
-            <a href="/about" class="link subpanel">
-                Об авторе
-            </a>
-            </nav>
+    <div class="container">
+        <div class="row">
+            <h1>Главная</h1>
         </div>
-    </header>
+        {% if form %}
+        <div>
+            <p class="text">
+                Здесь можно создать портфель акций.
+            </p>
+            <form class="form" method="POST">
+                {% csrf_token %}
+                {{ form }}
+                <br><br>
+                <button class="btn-default" style="border: 1px solid black;">Создать портфель</button>
+            </form>
+        </div>
+        {% elif formStock%}
+        <div>
+            <p class="text">
+                Ваш портфель {{namePortfolio}}:
+            </p>
+            <form class="form" method="POST">
+                {% csrf_token %}
+                {% for field in formStock %}
+                    {{field.label_tag}}
+                    {{field}}
+                    <br><br>
+                {%endfor%}
+                <br><br>
+                <button class="btn-default" style="border: 1px solid black;">Добавить акцию</button>
+            </form>
+        </div>
+        {% endif %}
+
+    </div>
 </body>
 
 </html>

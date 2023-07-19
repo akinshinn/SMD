@@ -2,10 +2,9 @@ import datetime
 
 
 class Stock:
-    def __init__(self, tick: str,  priceRUB: float, portfolio,  amount: int = 1, industry: str = None, dateBuying: datetime.date = datetime.date.today()):
+    def __init__(self, tick: str,  priceRUB: float,  amount: int = 1, industry: str = None, dateBuying: datetime.date = datetime.date.today()):
         self._amount = amount
         self._priceRUB = priceRUB
-        self._portfolio = portfolio
         self._tick = tick
         self._industry = industry
         self._dateBuying = dateBuying
@@ -38,8 +37,9 @@ class Stock:
 
 
 class StockPortfolio:
-    def __init__(self, stocks: list = []) -> None:
+    def __init__(self, name ,stocks: list = []) -> None:
         self._stocks = stocks
+        self._name = name
         self._sumStocksRub = self.getSumStocks()
         self._amountOfStocks = self.getAmount()
 
@@ -83,6 +83,11 @@ class StockPortfolio:
     @property
     def stocks(self):
         return self._stocks
+    @property
+    def name(self):
+        return self._name
+    def name(self, value):
+        self._name = value
 
     def setStocks(self, stocks):
         self._stocks = stocks
