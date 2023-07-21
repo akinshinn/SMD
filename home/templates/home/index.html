@@ -11,39 +11,117 @@
 
 <body>
     <div class="container">
-        <div class="row">
-            <h1>Главная</h1>
-        </div>
-        {% if form %}
-        <div>
-            <p class="text">
-                Здесь можно создать портфель акций.
-            </p>
-            <form class="form" method="POST">
-                {% csrf_token %}
-                {{ form }}
-                <br><br>
-                <button class="btn-default" style="border: 1px solid black;">Создать портфель</button>
-            </form>
-        </div>
-        {% elif formStock%}
-        <div>
-            <p class="text">
-                Ваш портфель {{namePortfolio}}:
-            </p>
-            <form class="form" method="POST">
-                {% csrf_token %}
-                {% for field in formStock %}
-                    {{field.label_tag}}
-                    {{field}}
-                    <br><br>
-                {%endfor%}
-                <br><br>
-                <button class="btn-default" style="border: 1px solid black;">Добавить акцию</button>
-            </form>
-        </div>
-        {% endif %}
+        <div class="row justify-content-center align-items-center g-2">
+            <div class="col-8">
+                <h1>Главная</h1>
+                {% if isError %}
 
+                <div class="alert  alert-dismissible fade show" role="alert" style="border: 1px solid;">
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                
+                    <strong>Ошибка</strong> {{textError}}
+                </div>
+                {% endif %}
+                
+                
+                <!-- Обработчик событий -->
+                <form method="POST" autocomplete="off" action='/'>
+                    {% csrf_token %}
+                        <p>Вы можете добавить акцию в портфель здесь</p>
+                        <div class='container'>
+                            <div class='row'>
+                                <div class='col-10 mx-auto' style="border: 1px solid; border-radius: 10px;">
+                                    {% if not isAnyPortfolioCreated %}
+                                    <p>У вас еще нет ни одного портфеля акций. Создайте его на этой странице</p>
+                                    <div class="mb-3">
+                                        {{ portfolioForm.portfolioName }}  
+                                        <button type="submit" class="btn btn-md" style="border: 1px solid black;">Создать</button>
+                                    </div>
+                                    {% else %}
+                                    <div class="mb-3">
+                                        <label for="tick" class="form-label">TICK</label>
+                                            {{stockForm.tick}}
+                                        <small id="helpId" class="form-text text-muted">Например: YNDX</small>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="" class="form-label">Цена в руб.</label>
+                                            {{stockForm.priceRUB}}
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="" class="form-label">Количество</label>
+                                        {{stockForm.amount}}
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="" class="form-label">Отрасль</label>
+                                        {{stockForm.industry}}
+                                      <small id="helpId" class="form-text text-muted">Например: ИТ, Нефтегаз</small>
+
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="" class="form-label">Дата покупки</label>
+                                        {{stockForm.dateBuying}}
+                                        <small id="helpId" class="form-text text-muted">Формат: YYYY-MM-DD</small>
+                                    </div>    
+
+                                        
+                                    <div class="mb-3">
+                                        <label for="" class="form-label">Выберите портфель</label>
+                                        <select class="form-select form-select-sm" name="portfolio" id="portfolio">
+                                            {% for portfolio in userPortfolios%}
+                                                <option>{{portfolio.0}}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <button type="submit" class="btn btn-md center-block" style="border: 1px solid black;">Добавить</button>
+                                    {% endif %}
+                                    <br><br>
+                                    </div>
+                            </div>
+                        </div>
+                </form>
+            </div>
+            <!-- <div class="container">
+                <div class="row">
+                    <div class="col-12 mx-auto">
+                    <button type="button" class="btn btn-sm" data-bs-toggle="modal" data-bs-target="#modalId" style="border: 1px solid;">
+                        Создать новый портфель
+                    </button>
+                    
+                    <div class="modal fade" id="modalId" tabindex="-1" data-bs-keyboard="true" role="dialog" aria-labelledby="modalTitleId" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-md" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="modalTitleId">Создать портфель</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <form method="POST" autocomplete="off">
+                                    {% csrf_token %}
+                                    <div class="modal-body">
+                                        <div class="mb-3">
+                                            {{ portfolioForm.portfolioName }}  
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                            <button type="submit" class="btn btn-md" style="border: 1px solid black;">Создать</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    </div>
+
+                </div> -->
+                
+                
+                
+                
+                <!-- Optional: Place to the bottom of scripts -->
+                <script>
+                    const myModal = new bootstrap.Modal(document.getElementById('modalId'), options)
+                </script>
+            </div>
+        </div>
     </div>
 </body>
 

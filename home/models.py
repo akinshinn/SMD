@@ -3,6 +3,7 @@ from django.db import models
 # Create your models here.
 class StockPortfolioModel(models.Model):
     name = models.CharField(max_length=50)
+    user = models.IntegerField()
 
 class StockModel(models.Model):
     tick = models.CharField(max_length=4)
