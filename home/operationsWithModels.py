@@ -20,8 +20,16 @@ def getUserPortfolios(UserID = 1):
 
 def getStocksFromPortfolio(PortfolioID):
     result = []
-    for stock in StockPortfolioModel.objects.filter(Portfolio_id = PortfolioID):
+    portfolio = StockPortfolioModel.objects.get(id = PortfolioID)
+    for stock in StockModel.objects.filter(Portfolio = portfolio):
         cStock = Stock(stock.tick, stock.priceRUB,  stock.amount, stock.industry, stock.dateBuying)
         result += [cStock]
     return result
 
+
+def getStocksFromUserPortfolios(UserID = 1):
+    result = {}
+    portfolios = getUserPortfolios(UserID)
+    for portfolioName, portfolioID in portfolios:
+        result[portfolioID] = getStocksFromPortfolio(portfolioID)
+    return result

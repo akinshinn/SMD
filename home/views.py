@@ -44,7 +44,6 @@ def index(request):
 def profile(request):
     return render(request, 'home/profile.html')
 
-
 def about(request):
     return render(request, 'home/about.html')
 
@@ -64,3 +63,13 @@ def sign_up(request):
 
 def diary(request):
     return render(request, "home/diary.html")
+
+def portfolios(request):
+    userID = 1
+    portfolioAndStocks= []
+    for p in getUserPortfolios(userID):
+        portfolioAndStocks += [[p[0], getStocksFromPortfolio(p[1])]]
+    data = {"portfolios": portfolioAndStocks}
+
+    return render(request, "home/portfolios.html", context=data)
+
