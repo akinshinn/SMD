@@ -1,5 +1,5 @@
-from .models import StockModel, StockPortfolioModel
-from .StockPortfolio import StockPortfolio, Stock
+from .models import *
+from .StockPortfolio import *
 
 
 def deleteAllFromModel(model):
@@ -33,3 +33,14 @@ def getStocksFromUserPortfolios(UserID = 1):
     for portfolioName, portfolioID in portfolios:
         result[portfolioID] = getStocksFromPortfolio(portfolioID)
     return result
+
+
+def getUniqueUserStockTicks(UserID = 1):
+    result = list(UniqUserStockModel.objects.filter(user = UserID).values_list("tick", flat=True))
+    result.sort()
+    return result
+
+
+def getAllUserPosts(UserID = 1):
+    posts = DiaryPostModel.objects.filter(user = UserID)
+    return posts

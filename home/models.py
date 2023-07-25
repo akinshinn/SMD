@@ -13,3 +13,18 @@ class StockModel(models.Model):
     dateBuying = models.DateField()
     Portfolio = models.ForeignKey(StockPortfolioModel, on_delete=models.CASCADE)
     
+class UniqUserStockModel(models.Model):
+    tick = models.CharField(max_length=4)
+    industry = models.CharField(max_length=50)
+    user = models.IntegerField()
+
+class DiaryPostModel(models.Model):
+    Stock = models.ForeignKey(UniqUserStockModel, on_delete=models.DO_NOTHING)
+    priceOpen = models.FloatField()
+    priceClose = models.FloatField()
+    priceMax = models.FloatField(null=True)
+    priceMin = models.FloatField(null=True)
+    msg = models.TextField()
+    date = models.DateField()
+    user = models.IntegerField()
+

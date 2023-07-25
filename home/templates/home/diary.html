@@ -1,13 +1,68 @@
-{% include "home/base.html"%}
-<!DOCTYPE html>
-{% load static %}
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Мой Дневник</title>
-</head>
-<body>
-    
-</body>
-</html>
+{% extends 'home/base.html' %}
+{% block content %}
+    <br>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-10">
+                <h4>Ваш Дневник:</h4>
+                {%if isPosted%}
+                    {% for post in posts %}
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-8 mycontainer mx-auto">
+                                <div class="container">
+                                    <div class="row">
+                                        <div class="col-5">
+                                            <h5>{{post.Stock.tick}}</h5>
+                                            <p>
+                                                Цена открытия: {{post.priceOpen}} руб.
+                                            </p>
+                                            <p>
+                                                Цена закрытия: {{post.priceClose}} руб.
+                                            </p>
+                                            {%if post.priceMin%}
+                                            <p>
+                                                Минимальная цена: {{post.priceMin}} руб.
+                                            </p>
+                                            {%endif%}
+                                            {%if post.priceMax%}
+                                            <p>
+                                                Максимальная цена: {{post.priceMax}} руб.
+                                            </p>
+                                            {%endif %}
+                                            <p>
+                                                Дата поста: {{post.date}}
+                                            </p>
+                                        </div>
+                                        <div class="col-7">
+                                            <h6>Пост:</h6>
+                                            <div class="text-wrap text-break">
+                                                {{post.msg}}
+                                            </div>
+                                        </div>
+                                        
+                                    </div>
+                                </div>
+                                
+                            </div>
+                        </div>
+                    </div>
+                    <br>
+                    {%endfor%}
+                            
+                {%else%}
+                <p>Вы не выложили еще ни одной записи. Нажмите "Создать запись"</p>
+                {%endif%}
+                
+            </div>
+            <div class="col-2">
+                <br>
+                <a type="button" class="btn mybtn btn-lg" href="{% url 'add-post' %}">
+                    Создать запись
+                </a>
+            </div>
+            
+        </div>
+    </div>
+{% endblock content %}
