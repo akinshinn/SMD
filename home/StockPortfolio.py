@@ -2,17 +2,20 @@ import datetime
 
 
 class Stock:
-    def __init__(self, tick: str,  priceRUB: float,  amount: int = 1, industry: str = None, dateBuying: datetime.date = datetime.date.today()):
+    def __init__(self, id: int, tick: str,  priceRUB: float,  amount: int = 1, industry: str = None, dateBuying: datetime.date = datetime.date.today()):
         self._amount = amount
         self._priceRUB = priceRUB
         self._tick = tick
         self._industry = industry
         self._dateBuying = dateBuying
+        self._id = id
 
     @property
-    def priceRUB(self) -> str:
+    def priceRUB(self) -> int:
         return self._priceRUB
-
+    @property
+    def id(self) -> int:
+        return self._id
     @property
     def tick(self) -> str:
         return self._tick

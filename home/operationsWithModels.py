@@ -22,7 +22,7 @@ def getStocksFromPortfolio(PortfolioID):
     result = []
     portfolio = StockPortfolioModel.objects.get(id = PortfolioID)
     for stock in StockModel.objects.filter(Portfolio = portfolio):
-        cStock = Stock(stock.tick, stock.priceRUB,  stock.amount, stock.industry, stock.dateBuying)
+        cStock = Stock(stock.id, stock.tick, stock.priceRUB,  stock.amount, stock.industry, stock.dateBuying)
         result += [cStock]
     return result
 
@@ -44,3 +44,7 @@ def getUniqueUserStockTicks(UserID = 1):
 def getAllUserPosts(UserID = 1):
     posts = DiaryPostModel.objects.filter(user = UserID)
     return posts
+
+
+def getCurrentUser():
+    return 1

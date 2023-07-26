@@ -1,0 +1,117 @@
+{% extends 'home/base.html' %}
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center align-items-center g-2">
+        <div class="col-8">
+            {% for textErr in textError %}
+                <br>
+                <div class="alert  alert-dismissible fade show" role="alert" style="border: 1px solid;">
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                
+                    <strong>Ошибка</strong> {{textErr}}
+                </div>
+            {% endfor %}
+            
+            <h4>Редактировать акцию</h4>
+            
+            <!-- Обработчик событий -->
+                <div class='container'>
+                    <div class='row'>
+                        <div class='col-10 mx-auto' style="border: 1px solid; border-radius: 10px;">
+                            <form method="POST" autocomplete="off">
+                                {% csrf_token %}
+                                <div class="mb-3">
+                                    <label for="tick" class="form-label">TICK</label>
+                                    <input type="text" class="form-control form-control-sm" value="{{stock.tick}}"
+                                    name="tick" id="tick" aria-describedby="helpId" minlength="4" maxlength="4" placeholder="">
+                                        
+                                </div>
+                                <div class="mb-3">
+                                    <label for="" class="form-label">Цена в руб.</label>
+                                    <input type="text" class="form-control form-control-sm" value="{{stock.priceRUB}}"
+                                    name="priceRUB" id="priceRUB" aria-describedby="helpId" placeholder="">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="" class="form-label">Количество</label>
+                                    <input type="number" class="form-control form-control-sm" value="{{stock.amount}}"
+                                    name="amount" id="amount" min="1" aria-describedby="helpId" placeholder="">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="" class="form-label">Отрасль</label>
+                                    <input type="text" class="form-control form-control-sm" value="{{stock.industry}}"
+                                    name="industry" id="industry" aria-describedby="helpId" placeholder="">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="" class="form-label">Дата покупки</label>
+                                    <input type="date" class="form-control form-control-sm" value="{{date}}"
+                                    name="dateBuying" id="dateBuying" aria-describedby="helpId" placeholder="">
+                                </div>    
+                                <div class="mb-3">
+                                    <label for="" class="form-label">Выберите портфель </label>
+                                    <select class="form-select form-select-sm" name="portfolio" id="portfolio">
+                                        {% for portfolio in userPortfolios%}
+                                            {% with tagPortfolio=portfolio.0 %}
+                                            {% if tagPortfolio == stock.Portfolio.name %}
+                                                <option>{{portfolio.0}}</option>
+                                            {%endif%}
+                                            {% endwith %}
+                                        {% endfor %}
+                                        {% for portfolio in userPortfolios%}
+                                            {% with tagPortfolio=portfolio.0 %}
+                                            {% if tagPortfolio != stock.Portfolio.name %}
+                                                <option>{{portfolio.0}}</option>
+                                            {%endif%}
+                                            {% endwith %}
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn btn-md center-block" style="border: 1px solid black;">Изменить</button>
+                                <button type="button" class="btn mybtn btn-md btn-secondary" data-bs-toggle="modal" data-bs-target="#modalId">
+                                    Удалить
+                                </button>
+                            </form>
+                            <form method="POST" action="/delete/{{stock.id}}">
+                                {% csrf_token %}                
+                                
+                                <!-- Modal -->
+                                <div class="modal fade" id="modalId" tabindex="-1" role="dialog" aria-labelledby="modalTitleId" aria-hidden="true">
+                                    <div class="modal-dialog" role="document">
+                                        <div class="modal-content">
+                                                <div class="modal-header">
+                                                        <h5 class="modal-title" id="modalTitleId">Удаление акции</h5>
+                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                            <div class="modal-body">
+                                                <div class="container-fluid">
+                                                    Вы действительно хотите удалить акцию? При удалении, она отобразиться во вкладке история.
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                                                <button type="submit" class="btn mybtn">Удалить</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                            <br>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    var modalId = document.getElementById('modalId');
+
+    modalId.addEventListener('show.bs.modal', function (event) {
+          // Button that triggered the modal
+          let button = event.relatedTarget;
+          // Extract info from data-bs-* attributes
+          let recipient = button.getAttribute('data-bs-whatever');
+
+        // Use above variables to manipulate the DOM
+    });
+</script>
+{% endblock content %}

@@ -1,7 +1,8 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from .forms import *
 from .models import *
 from .operationsWithModels import *
+from datetime import date
 
 
 def index(request):
@@ -104,3 +105,65 @@ def addPost(request):
         if not data["isError"]:
             cPost.save()
     return render(request, "home/add-post.html", context=data)
+
+def editStockPage(request, id):
+    userID = 1
+    stock = StockModel.objects.get(id = id)
+    data = {"stock": stock,
+            "title": "Редактировать акцию",
+            "form": EditStockForm(),
+            "userPortfolios": getUserPortfolios(userID),
+            "isError": False,
+            "textError": [],
+            "date" : str(stock.dateBuying)}
+    if request.method == "POST":
+        stock.tick = request.POST.get("tick").upper()
+        priceRUB = request.POST.get('priceRUB').replace(",", ".")
+        try:
+            print(priceRUB)
+
+            priceRUB = float(priceRUB)
+            if priceRUB < 0:
+                raise ValueError
+            stock.priceRUB = priceRUB
+            
+        except ValueError:
+            data["isError"] = True
+            data["textError"] += ["Значение цены должно быть положительным"]
+        except:
+            data["isError"] = True
+            data["textError"] += ["В поле цены необходимо ввести число."]
+        amount = request.POST.get("amount")
+        if int(amount) == float(amount):
+            stock.amount = amount
+        else:
+            data["isError"] = True
+            data["textError"] += ["Значение количества акций должно быть натуральным"]
+        
+        stock.industry = request.POST.get("industry")
+        dateBuying = request.POST.get("dateBuying")
+        try:
+            
+            dateBuying = map(int, dateBuying.split("-")) if "-" in dateBuying else map(int, dateBuying.split("."))[::-1]
+            dateBuying = datetime.date(*dateBuying)
+            stock.dateBuying = dateBuying
+        except:
+            data["isError"] = True
+            data["textError"] += ["Неправильный формат даты"]
+        portfolio = request.POST.get("portfolio")
+        portfolio = StockPortfolioModel.objects.get(user = userID, name = portfolio)
+        stock.Portfolio = portfolio
+        if data["isError"]:
+            return render(request, "home/edit-stock.html", context=data)
+        stock.save()
+        return redirect("/portfolios")            
+        
+    return render(request, "home/edit-stock.html", context=data)
+
+def deleteStockPage(request, id):
+    userID = 1 
+    if userID == getCurrentUser():
+        stock = StockModel.objects.get(id = id).delete()
+    # ДОБАВИТЬ ДОБАВЛЕНИЕ В ИСТОРИЮ
+
+    return redirect("/portfolios")

@@ -10,5 +10,7 @@ urlpatterns = [
     path('sign-up/', views.sign_up, name='sign-up'),
     path('diary/', views.diary, name="diary"),
     path('portfolios/', views.portfolios, name="portfolios"), 
-    path('add-post/', views.addPost, name="add-post")
+    path('add-post/', views.addPost, name="add-post"),
+    path('portfolios/edit-stock/<int:id>', views.editStockPage, name="editStock"),
+    path('delete/<int:id>', views.deleteStockPage, name="delete")
 ]
