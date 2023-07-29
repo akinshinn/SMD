@@ -4,6 +4,7 @@ from django.db import models
 class StockPortfolioModel(models.Model):
     name = models.CharField(max_length=50)
     user = models.IntegerField()
+    money = models.FloatField()
 
 class StockModel(models.Model):
     tick = models.CharField(max_length=4)
@@ -12,10 +13,10 @@ class StockModel(models.Model):
     industry = models.CharField(max_length=50)
     dateBuying = models.DateField()
     Portfolio = models.ForeignKey(StockPortfolioModel, on_delete=models.CASCADE)
+    user = models.IntegerField()
     
 class UniqUserStockModel(models.Model):
     tick = models.CharField(max_length=4)
-    industry = models.CharField(max_length=50)
     user = models.IntegerField()
 
 class DiaryPostModel(models.Model):
@@ -28,3 +29,13 @@ class DiaryPostModel(models.Model):
     date = models.DateField()
     user = models.IntegerField()
 
+class HistoryModel(models.Model):
+    tick = models.CharField(max_length=4)
+    priceBuy = models.FloatField()
+    priceSell = models.FloatField()
+    reasonSell = models.TextField()
+    reasonBuy = models.TextField()
+    dateBuy = models.DateField()
+    dateSell = models.DateField()
+    industry = models.CharField(max_length=50)
+    portfolio = models.ForeignKey(StockPortfolioModel, on_delete=models.DO_NOTHING)

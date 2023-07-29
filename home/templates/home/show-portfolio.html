@@ -1,0 +1,144 @@
+{% extends 'home/base.html' %}
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-10">
+            {% for textErr in textError %}
+                <br>
+                <div class="alert  alert-dismissible fade show" role="alert" style="border: 1px solid;">
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                
+                    <strong>Ошибка</strong> {{textErr}}
+                </div>
+            {% endfor %} 
+            <h5>{{portfolio.name}}</h5>
+            <div class="container">
+                <div class="row">
+                    <div class="col-12 mycontainer">
+                        
+                        <h5>Статистика:</h5>
+                        <p>Все средства: <strong>{{portfolio.money}}</strong> руб.</p>
+                        <p>Свободные средства: <strong>{{portfolioStats.freeMoney}}</strong> руб.</p>
+                        <p>Свободные средства в процентах: <strong>{{portfolioStats.percentFreeMoney}}</strong>%</p>
+                        <p>Вложенные средства: <strong>{{portfolioStats.ReservedMoney}}</strong> руб.</p>
+                        <p>Вложенные средства: <strong>{{portfolioStats.percentReservedMoney}}</strong>%</p>
+                        <h5>Акции:</h5>
+                            {% for stock in stocks %}
+                                <div class="container">
+                                    <div class="row">
+                                        <div class="col-6 mx-auto mystock mycontainer">
+                                            <p>
+                                                TICK: <a href="/portfolios/edit-stock/{{stock.id}}" class="mylink">{{stock.tick}}</a> <br>
+                                                Цена: {{stock.priceRUB}} руб. <br> 
+                                                Количество: {{stock.amount}} <br>
+                                                Дата покупки: {{stock.dateBuying}} <br>
+                                                Отрасль: {{stock.industry}}
+                                            </p>
+                                            <div class="container">
+                                                <div class="row">
+                                                    <div class="d-flex justify-content-end col-12">
+                                                        <a href="/portfolios/edit-stock/{{stock.id}}" class="mylink">редактировать</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <br>
+                            {%endfor%}
+                        <!-- Button trigger modal -->
+                        <button type="button" class="btn btn-secondary btn-md" data-bs-toggle="modal" data-bs-target="#modalId">
+                            Редактировать портфель
+                        </button>
+                        <!-- Button trigger modal -->
+                        <button type="button" class="btn btn-secondary btn-md" data-bs-toggle="modal" data-bs-target="#modalId2">
+                          Удалить портфель
+                        </button>
+                        
+                        <!-- Modal -->
+                        <div class="modal fade" id="modalId2" tabindex="-1" role="dialog" aria-labelledby="modalTitleId" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                        <div class="modal-header">
+                                                <h5 class="modal-title" id="modalTitleId">Удалить портфель</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                    <div class="modal-body">
+                                        <div class="container-fluid">
+                                            Вы дейстительно хотите удалить портфель. Его нельзя будет восстанивить, и все акции будут удалены.
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <a href="/delete-portfolio/{{portfolio.id}}" class="btn btn-secondary">Удалить</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        
+                        <br><br>
+                        
+                        <!-- Modal -->
+                        <form method="POST">
+                            {% csrf_token %}
+                            <div class="modal fade" id="modalId" tabindex="-1" role="dialog" aria-labelledby="modalTitleId" aria-hidden="true">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                            <div class="modal-header">
+                                                    <h5 class="modal-title" id="modalTitleId">Редактировать портфель</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                        <div class="modal-body">
+                                            <div class="container-fluid">
+                                                <div class="mb-3">
+                                                    <label for="" class="form-label">Название портфеля</label>
+                                                    <input type="text" value="{{portfolio.name}}"
+                                                        class="form-control form-control-sm" name="portfolioName" id="portfolioName" aria-describedby="helpId" placeholder="">
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label for="" class="form-label">Средства портфеля</label>
+                                                    <input type="text" value={{portfolio.money}} min="{{portfolioStats.ReservedMoney}}" 
+                                                        class="form-control form-control-sm" name="portfolioMoney" id="portfolioName" aria-describedby="helpId" placeholder="">
+                                                    </div>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="submit" class="btn btn-secondary">Сохранить</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                        
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<br>
+    
+<script>
+    var modalId = document.getElementById('modalId');
+
+    modalId.addEventListener('show.bs.modal', function (event) {
+            // Button that triggered the modal
+            let button = event.relatedTarget;
+            // Extract info from data-bs-* attributes
+            let recipient = button.getAttribute('data-bs-whatever');
+
+        // Use above variables to manipulate the DOM
+    });
+    var modalId2 = document.getElementById('modalId2');
+                        
+    modalId2.addEventListener('show.bs.modal', function (event) {
+          // Button that triggered the modal
+          let button = event.relatedTarget;
+          // Extract info from data-bs-* attributes
+          let recipient = button.getAttribute('data-bs-whatever');
+
+        // Use above variables to manipulate the DOM
+    });
+</script>
+{% endblock content%}

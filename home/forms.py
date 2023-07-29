@@ -22,10 +22,13 @@ class StockForm(forms.Form):
 
 
 class StockPortfolioForm(forms.Form):
-    portfolioName = forms.CharField(widget=forms.TextInput(attrs={"class":"form-control form-control", 
-                                                         'aria-describedby':"helpId",  
-                                                         'placeholder':"Название вашего портфеля",
-                                                         "id": "portfolioName"}))
+    attrs = {"class":"form-control form-control", 'aria-describedby':"helpId"}
+    attrs["placeholder"] = "Название вашего портфеля"
+    attrs["id"] = "portfolioName"
+    portfolioName = forms.CharField(widget=forms.TextInput(attrs=attrs))
+    attrs['placeholder'] = "Средства портфеля в рублях"
+    attrs["id"] = "portfolioMoney"
+    portfolioMoney = forms.FloatField(min_value=1, widget=forms.NumberInput(attrs=attrs))
 
 
 class DiaryPostForm(forms.Form):

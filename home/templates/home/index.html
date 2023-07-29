@@ -4,14 +4,14 @@
         <div class="row justify-content-center align-items-center g-2">
             <div class="col-8">
                 <h1>Главная</h1>
-                {% if isError %}
-
+                {% for textErr in textError %}
+                <br>
                 <div class="alert  alert-dismissible fade show" role="alert" style="border: 1px solid;">
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 
-                    <strong>Ошибка</strong> {{textError}}
+                    <strong>Ошибка</strong> {{textErr}}
                 </div>
-                {% endif %}
+            {% endfor %}
                 
                 
                 <!-- Обработчик событий -->
@@ -25,8 +25,12 @@
                                     <p>У вас еще нет ни одного портфеля акций. Создайте его на этой странице</p>
                                     <div class="mb-3">
                                         {{ portfolioForm.portfolioName }}  
+                                        <br>
+                                        {{ portfolioForm.portfolioMoney }}
                                         <button type="submit" class="btn btn-md" style="border: 1px solid black;">Создать</button>
+                                        <br>
                                     </div>
+                                    
                                     {% else %}
                                     <div class="mb-3">
                                         <label for="tick" class="form-label">TICK</label>
@@ -63,9 +67,10 @@
                                             {% endfor %}
                                         </select>
                                     </div>
-                                    <button type="submit" class="btn btn-md center-block" style="border: 1px solid black;">Добавить</button>
-                                    {% endif %}
+                                    <a type="submit" href="/portfolios/show-portfolio" class="btn btn-md center-block" style="border: 1px solid black;">Добавить</a>
                                     <br><br>
+                                    {% endif %}
+                                    
                                     </div>
                             </div>
                         </div>

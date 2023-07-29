@@ -3,14 +3,22 @@
     <div class="container">
         <div class="row">
             <div class="col-10 mx-auto">
+                {% for textErr in textError %}
+                    <br>
+                    <div class="alert  alert-dismissible fade show" role="alert" style="border: 1px solid;">
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    
+                        <strong>Ошибка</strong> {{textErr}}
+                    </div>
+                {% endfor %} 
                 <h3>Ваши портфели:</h3>
-                {% for portfolio, stocks in portfolios %}
+                {% for portfolio, portfolioStats, stocks in portfoliosAndStocks %}
                     <div class="container">
                         <div class="row">
                             <div class="col-10 mx-auto" style="border: 1px solid; border-radius: 5px;">
-                                <h5>Название: {{portfolio}}</h5>
+                                <h5>Название: <a href="show-portfolio/{{portfolio.1}}" class="mylink">{{portfolio.0}}</a></h5>
                                 <h5>Акции:</h5>
-                                    {% for stock in stocks%}
+                                    {% for stock in stocks %}
                                         <div class="container">
                                             <div class="row">
                                                 <div class="col-6 mx-auto mystock mycontainer">
@@ -38,9 +46,64 @@
                         </div>
                     </div>
                     <br>
+                    
                 {% endfor %}
+
+            </div>
+            <div class="col-2">
+                <br>
+                <!-- Button trigger modal -->
+                <button type="button" class="btn btn-secondary btn-md" data-bs-toggle="modal" data-bs-target="#modalId">
+                  Создать портфель
+                </button>
+                
+                <!-- Modal -->
+                <div class="modal fade" id="modalId" tabindex="-1" role="dialog" aria-labelledby="modalTitleId" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                                <div class="modal-header">
+                                        <h5 class="modal-title" id="modalTitleId">Создать портфель</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                        <form method="POST">    
+                            {% csrf_token %}
+                            <div class="modal-body">
+                                <div class="container-fluid">
+                                        <div class="mb-3">
+                                            {{ portfolioForm.portfolioName }}  
+                                        </div>
+                                        <div class="mb-3">
+                                            {{ portfolioForm.portfolioMoney }}  
+                                        </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="submit" class="btn btn-secondary">Создать</button>
+                            </div>
+                        </form>
+                        
+                           
+                        </div>
+                    </div>
+                </div>
+                
+
+                
             </div>
         </div>
 
     </div>
+
+<script>
+    var modalId = document.getElementById('modalId');
+
+    modalId.addEventListener('show.bs.modal', function (event) {
+            // Button that triggered the modal
+            let button = event.relatedTarget;
+            // Extract info from data-bs-* attributes
+            let recipient = button.getAttribute('data-bs-whatever');
+
+        // Use above variables to manipulate the DOM
+    });
+</script>
 {% endblock content %}
