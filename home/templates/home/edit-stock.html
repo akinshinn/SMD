@@ -12,7 +12,7 @@
                 </div>
             {% endfor %}
             
-            <h4>Редактировать акцию</h4>
+            <h3>Редактировать акцию</h3>
             
             <!-- Обработчик событий -->
                 <div class='container'>
@@ -32,6 +32,16 @@
                                     name="priceRUB" id="priceRUB" aria-describedby="helpId" placeholder="">
                                 </div>
                                 <div class="mb-3">
+                                    <label for="" class="form-label">Цель</label>
+                                    <input type="text" class="form-control form-control-sm" value="{{stock.target}}"
+                                    name="target" id="target" aria-describedby="helpId" placeholder="">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="" class="form-label">Стоп приказ</label>
+                                    <input type="text" class="form-control form-control-sm" value="{{stock.stop}}"
+                                    name="stop" id="stop" aria-describedby="helpId" placeholder="">
+                                </div>
+                                <div class="mb-3">
                                     <label for="" class="form-label">Количество</label>
                                     <input type="number" class="form-control form-control-sm" value="{{stock.amount}}"
                                     name="amount" id="amount" min="1" aria-describedby="helpId" placeholder="">
@@ -47,19 +57,23 @@
                                     name="dateBuying" id="dateBuying" aria-describedby="helpId" placeholder="">
                                 </div>    
                                 <div class="mb-3">
+                                  <label for="" class="form-label">Причина покупки</label>
+                                  <textarea class="form-control" name="reasonBuy" id="reasonBuy" rows="4">{{stock.reasonBuy}}</textarea>
+                                </div> 
+                                <div class="mb-3">
                                     <label for="" class="form-label">Выберите портфель </label>
                                     <select class="form-select form-select-sm" name="portfolio" id="portfolio">
                                         {% for portfolio in userPortfolios%}
-                                            {% with tagPortfolio=portfolio.0 %}
+                                            {% with tagPortfolio=portfolio.name %}
                                             {% if tagPortfolio == stock.Portfolio.name %}
-                                                <option>{{portfolio.0}}</option>
+                                                <option>{{portfolio.name}}</option>
                                             {%endif%}
                                             {% endwith %}
                                         {% endfor %}
                                         {% for portfolio in userPortfolios%}
-                                            {% with tagPortfolio=portfolio.0 %}
+                                            {% with tagPortfolio=portfolio.name %}
                                             {% if tagPortfolio != stock.Portfolio.name %}
-                                                <option>{{portfolio.0}}</option>
+                                                <option>{{portfolio.name}}</option>
                                             {%endif%}
                                             {% endwith %}
                                         {% endfor %}

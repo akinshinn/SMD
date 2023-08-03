@@ -1,0 +1,105 @@
+{% extends 'home/base.html' %}
+{% block content %}
+
+<div class="container">
+    <div class="row">
+        <div class="col-10">
+            <h3>{{stock.tick}}</h3>
+            {% for textErr in textError %}
+            <br>
+            <div class="alert  alert-dismissible fade show" role="alert" style="border: 1px solid;">
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            
+                <strong>Ошибка</strong> {{textErr}}
+            </div>
+            {% endfor %} 
+            <div class="container">
+                <div class="row">
+                    <div class="col-10 mycontainer mx-auto">
+                        
+                    <h5>Сведения:</h5>
+                    <p>Дата покупки: {{stock.dateBuying}}</p>
+                    <p>Цена покупки: {{stock.priceRUB}} руб.</p>
+                    <p>Цель: {{stock.target}} руб.</p>
+                    <p>Цель в %: {{stockInfo.profitPercent | floatformat}} %</p>
+                    <p>Стоп приказ: {{stock.stop}} руб.</p>
+                    <p>Стоп приказ в процентах: {{stockInfo.risksPercent | floatformat}} %</p>
+                    <p>Риск: {{stockInfo.risk}} руб./акция</p>
+                    <p>Профит: {{stockInfo.profit}} руб./акция</p>
+                    <p>Проскальзывание: {{stockInfo.slippage}} руб.</p>
+                    <p>Максимальные комиссионные: {{stockInfo.commissionMax}} руб.</p>
+                    <p>Минимальные комиссионные: {{stockInfo.commissionMin}} руб.</p>
+                    <p>Количество: {{stock.amount}} шт.</p>
+                    <p>Процент от портфеля: {{stockInfo.portfolioPercent | floatformat}} %</p>
+                    <p>Отрасль: {{stock.industry}}</p>
+                    <p>Максимальная бумажная прибыль: {{stockInfo.maxProfit | floatformat}} руб.</p>
+                    <p>Максимальная бумажная потеря: {{stockInfo.maxLoss | floatformat}}  руб.</p>
+                    <p>Причины покупки: {{stock.reasonBuy}}</p>
+                    <p>Портфель: <a class="mylink" href="/portfolios/show-portfolio/{{stock.Portfolio.id}}">{{stock.Portfolio.name}}</a></p>
+                    
+                    
+                    <!-- Button trigger modal -->
+                    <a type="button" href="/portfolios/edit-stock/{{stock.id}}" class="btn btn-secondary btn-md">
+                        Редактировать акцию
+                    </a>
+                    <!-- Button trigger modal -->
+                    <button type="button" class="btn btn-secondary btn-md" data-bs-toggle="modal" data-bs-target="#modalId">
+                        Продать акцию
+                    </button>
+                    
+                    <!-- Modal -->
+                    <div class="modal fade" id="modalId" tabindex="-1" role="dialog" aria-labelledby="modalTitleId" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                        <h5 class="modal-title" id="modalTitleId">Продать акцию</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <form method="POST">
+                                    <div class="modal-body">
+                                        <div class="container-fluid">
+                                            <p>После продажи, она добавится в историю, и будет учитываться в статистике портфеля. Чтобы акция не отображалась
+                                                в вашей истории, её необходимо <strong><a href="/portfolios/edit-stock/{{stock.id}}" class="mylink">удалить</a> </strong>
+                                            </p>
+                                            <form method="POST">
+                                                {%csrf_token%}
+                                                <div class="mb-3">
+                                                    <label for="" class="form-label">Цена продажи</label>
+                                                    {{sellForm.priceSell}}
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label for="" class="form-label">Количество продажи</label>
+                                                    {{sellForm.amountSell}}
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label for="" class="form-label">Причина продажи</label>
+                                                    {{sellForm.reasonSell}}
+                                                </div>   
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="submit" class="btn btn-secondary">Продать</button>
+                                    </div>
+                                </form>
+                                
+                            </div>
+                        </div>
+                    </div>
+                    <br><br>
+                </div>
+            </div>
+        </div>
+        <br><br>
+<script>
+    var modalId = document.getElementById('modalId');
+
+    modalId.addEventListener('show.bs.modal', function (event) {
+            // Button that triggered the modal
+            let button = event.relatedTarget;
+            // Extract info from data-bs-* attributes
+            let recipient = button.getAttribute('data-bs-whatever');
+
+        // Use above variables to manipulate the DOM
+    });
+</script>                  
+{% endblock content%}

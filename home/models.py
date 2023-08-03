@@ -10,17 +10,17 @@ class StockModel(models.Model):
     tick = models.CharField(max_length=4)
     priceRUB = models.FloatField()
     amount = models.IntegerField()
-    industry = models.CharField(max_length=50)
+    industry = models.CharField(max_length=50, null=True)
     dateBuying = models.DateField()
     Portfolio = models.ForeignKey(StockPortfolioModel, on_delete=models.CASCADE)
     user = models.IntegerField()
-    
-class UniqUserStockModel(models.Model):
-    tick = models.CharField(max_length=4)
-    user = models.IntegerField()
+    reasonBuy = models.TextField()
+    target = models.FloatField()
+    stop = models.FloatField()
+
 
 class DiaryPostModel(models.Model):
-    Stock = models.ForeignKey(UniqUserStockModel, on_delete=models.DO_NOTHING)
+    stockTick = models.CharField(max_length=4)
     priceOpen = models.FloatField()
     priceClose = models.FloatField()
     priceMax = models.FloatField(null=True)
@@ -39,3 +39,5 @@ class HistoryModel(models.Model):
     dateSell = models.DateField()
     industry = models.CharField(max_length=50)
     portfolio = models.ForeignKey(StockPortfolioModel, on_delete=models.DO_NOTHING)
+    amountSell = models.IntegerField()
+    user = models.IntegerField()

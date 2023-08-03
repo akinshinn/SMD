@@ -1,0 +1,87 @@
+{% extends 'home/base.html' %}
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-10">
+                <h3>История покупок/продаж</h3>
+                {% if stocks %}
+                {% for stock, info in stocks %}
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-10 mx-auto mycontainer">
+                                <h5>{{stock.tick}}</h5>
+
+                                <p>Отрасль: {{stock.industry}}</p>
+                                <p>Дата покупки: {{stock.dateBuy}}</p>
+                                <p>Дата продажи: {{stock.dateSell}}</p>
+                                <p>Количество: <strong>{{stock.amountSell}}</strong> шт.</p>
+                                <p>Цена покупки: <strong>{{stock.priceBuy}}</strong> руб.</p>
+                                <p>Цена продажи: <strong>{{stock.priceSell}}</strong> руб.</p>
+                                <p>Итог на акцию без комиссионных: <strong>{{info.total | floatformat}}</strong> руб./акция</p>
+                                <p>Итог на акцию с учетом комиссионых: <strong>{{info.totalPerStock | floatformat}}</strong> руб./акция</p>
+                                <p>Итог сделки с учетом комиссионых: <strong>{{info.finalTotal | floatformat}}</strong> руб.</p>
+                                <p>Портфель: <a href="/portfolios/show-portfolio/{{stock.portfolio.id}}" class="mylink">{{stock.portfolio.name}}</a></p>
+                                <p>Причина покупки: {{stock.reasonBuy}}</p>
+                                <p>Причина продажи: {{stock.reasonSell}}</p>
+                                
+                                <div class="container">
+                                    <div class="row">
+                                        <div class="d-flex justify-content-start col-8 p-0">
+                                        </div>
+                                        <div class="d-flex justify-content-end col-4">
+                                            <!-- Button trigger modal -->
+                                            <button type="button" class="btn btn-secondary btn-md" data-bs-toggle="modal" data-bs-target="#modalId">
+                                                удалить
+                                            </button>
+                                            
+                                            <!-- Modal -->
+                                            <div class="modal fade" id="modalId" tabindex="-1" role="dialog" aria-labelledby="modalTitleId" aria-hidden="true">
+                                                <div class="modal-dialog" role="document">
+                                                    <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                    <h5 class="modal-title" id="modalTitleId">Удаление из истории проданных акций</h5>
+                                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                                </div>
+                                                        <div class="modal-body">
+                                                            <div class="container-fluid">
+                                                                Действительно удалить проданную акцию из истории? Её невозможно будет вернуть, и она перестанет
+                                                                учитывать в статистике портфеля.
+                                                            </div>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-primary">Удалить</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                    
+                                    </div>
+                                </div>
+                                
+                                
+                            </div>
+                        </div>
+                    </div> 
+                    <br>
+                {% endfor %}
+                {% else %}
+                <p>У вас пока нет проданных акций.</p>
+                {% endif %}    
+          
+            </div>
+        </div>
+    </div>
+    <script>
+        var modalId = document.getElementById('modalId');
+
+        modalId.addEventListener('show.bs.modal', function (event) {
+                // Button that triggered the modal
+                let button = event.relatedTarget;
+                // Extract info from data-bs-* attributes
+                let recipient = button.getAttribute('data-bs-whatever');
+
+            // Use above variables to manipulate the DOM
+        });
+    </script>
+{% endblock content%}

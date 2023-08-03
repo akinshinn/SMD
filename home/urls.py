@@ -14,5 +14,8 @@ urlpatterns = [
     path('portfolios/edit-stock/<int:id>', views.editStockPage, name="editStock"),
     path('delete/<int:id>', views.deleteStockPage, name="deleteStock"),
     path('portfolios/show-portfolio/<int:id>', views.showPortfolioPage, name="showPortfolio"),
-    path("delete-portfolio/<int:id>", views.deletePortfolioPage, name="deletePortfolio")
+    path("delete-portfolio/<int:id>", views.deletePortfolioPage, name="deletePortfolio"),
+    path("history", views.historyPage, name="history"),
+    path("show-stock/<int:id>", views.showStockPage, name="showStock"),
+    path("delete-sold-stock/<int:id>", views.deleteSoldStock, name="deleteSoldStock")
 ]

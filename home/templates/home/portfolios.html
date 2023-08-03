@@ -2,59 +2,113 @@
 {% block content %}
     <div class="container">
         <div class="row">
-            <div class="col-10 mx-auto">
+            <div class="col-10">
                 {% for textErr in textError %}
-                    <br>
-                    <div class="alert  alert-dismissible fade show" role="alert" style="border: 1px solid;">
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    
-                        <strong>Ошибка</strong> {{textErr}}
-                    </div>
+                <br>
+                <div class="alert  alert-dismissible fade show" role="alert" style="border: 1px solid;">
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                
+                    <strong>Ошибка</strong> {{textErr}}
+                </div>
                 {% endfor %} 
                 <h3>Ваши портфели:</h3>
+                {% if portfoliosAndStocks %}
                 {% for portfolio, portfolioStats, stocks in portfoliosAndStocks %}
                     <div class="container">
                         <div class="row">
                             <div class="col-10 mx-auto" style="border: 1px solid; border-radius: 5px;">
+                                
                                 <h5>Название: <a href="show-portfolio/{{portfolio.1}}" class="mylink">{{portfolio.0}}</a></h5>
+                                {% if portfolioStats.totalMonth > 0 %}
+                                    <p>
+                                        Итог за этот месяц: 
+                                        <span class="text-success"> 
+                                            <strong>{{portfolioStats.totalMonth | floatformat}}</strong> руб. 
+                                            (<strong>{{portfolioStats.totalMonthPercent | floatformat}}</strong>%)
+                                        </span>
+                                    </p>
+                                    {% elif portfolioStats.totalMonth < 0 %}
+                                    <p>
+                                        Итог за этот месяц: 
+                                        <span class="text-danger"> 
+                                            <strong>{{portfolioStats.totalMonth | floatformat}}</strong> руб. 
+                                            (<strong>{{portfolioStats.totalMonthPercent | floatformat}}</strong>%)
+                                        </span>
+                                    </p>
+                                    {% else %}
+                                    <p>
+                                        Итог за этот месяц: 
+                                        <span class="text-warning"> 
+                                        <strong>{{portfolioStats.totalMonth | floatformat}}</strong> руб. 
+                                        (<strong>{{portfolioStats.totalMonthPercent | floatformat}}</strong>%)
+                                        </span>
+                                    </p>
+                                    {%endif%}
+                                    
+                                    {% if portfolioStats.totalYear > 0 %}
+                                    <p>
+                                        Итог за этот год: 
+                                        <span class="text-success"> 
+                                            <strong>{{portfolioStats.totalYear | floatformat}}</strong> руб. 
+                                            (<strong>{{portfolioStats.totalYearPercent | floatformat}}</strong>%)
+                                        </span>
+                                    </p>
+                                    {% elif portfolioStats.totalYear < 0 %}
+                                    <p>
+                                        Итог за этот год: 
+                                        <span class="text-danger"> 
+                                            <strong>{{portfolioStats.totalYear | floatformat}}</strong> руб. 
+                                            (<strong>{{portfolioStats.totalYearPercent | floatformat}}</strong>%)
+                                        </span>
+                                    </p>
+                                    {% else %}
+                                    <p>
+                                        Итог за этот год: 
+                                        <span class="text-warning"> 
+                                        <strong>{{portfolioStats.totalYear | floatformat}}</strong> руб. 
+                                        (<strong>{{portfolioStats.totalYearPercent | floatformat}}</strong>%)
+                                        </span>
+                                    </p>
+                                    {%endif%}
                                 <h5>Акции:</h5>
-                                    {% for stock in stocks %}
-                                        <div class="container">
-                                            <div class="row">
-                                                <div class="col-6 mx-auto mystock mycontainer">
-                                                    <p>
-                                                        TICK: {{stock.tick}} <br>
-                                                        Цена: {{stock.priceRUB}} руб. <br> 
-                                                        Количество: {{stock.amount}} <br>
-                                                        Дата покупки: {{stock.dateBuying}} <br>
-                                                        Отрасль: {{stock.industry}}
-                                                    </p>
-                                                    <div class="container">
-                                                        <div class="row">
-                                                            <div class="d-flex justify-content-end col-12">
-                                                                <a href="edit-stock/{{stock.id}}" class="mylink">редактировать</a>
-                                                            </div>
-                                                            
-                                                        </div>
+                                {% for stock in stocks %}
+                                <div class="container">
+                                    <div class="row">
+                                        <div class="col-6 mx-auto mystock mycontainer">
+                                            <p>
+                                                TICK: <a href="/show-stock/{{stock.id}}" class="mylink">{{stock.tick}}</a> <br>
+                                                Цена: {{stock.priceRUB}} руб. <br>
+                                                Количество: {{stock.amount}} <br>
+                                                Дата покупки: {{stock.dateBuying}} <br>
+                                                Отрасль: {{stock.industry}}
+                                            </p>
+                                            <div class="container">
+                                                <div class="row">
+                                                    <div class="d-flex justify-content-end col-12">
+                                                        <a href="edit-stock/{{stock.id}}" class="mylink">редактировать</a>
                                                     </div>
+                                
                                                 </div>
                                             </div>
                                         </div>
-                                        <br>
-                                    {%endfor%}
+                                    </div>
+                                </div>
+                                <br>
+                                {%endfor%}
                             </div>           
                         </div>
                     </div>
                     <br>
-                    
                 {% endfor %}
-
             </div>
+            {%else%}
+            <p>У вас еще нет портфеля. Нажмите кнопку "Создать портфель"</p>
+            {% endif    %}
             <div class="col-2">
                 <br>
                 <!-- Button trigger modal -->
                 <button type="button" class="btn btn-secondary btn-md" data-bs-toggle="modal" data-bs-target="#modalId">
-                  Создать портфель
+                Создать портфель
                 </button>
                 
                 <!-- Modal -->
@@ -81,18 +135,14 @@
                                 <button type="submit" class="btn btn-secondary">Создать</button>
                             </div>
                         </form>
-                        
-                           
+            
                         </div>
                     </div>
                 </div>
-                
-
-                
             </div>
         </div>
-
     </div>
+
 
 <script>
     var modalId = document.getElementById('modalId');

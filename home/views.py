@@ -11,7 +11,7 @@ def index(request):
     data = {'title': "SMD",
             "portfolioForm": StockPortfolioForm(), "stockForm": StockForm(),
             "isAnyPortfolioCreated": StockPortfolioModel.objects.all().__len__() > 0,
-            "userPortfolios": getUserPortfolios(userID),
+            "userPortfolios": StockPortfolioModel.objects.filter(user = userID),
             "isError": False,
             "textError": []}
 
@@ -22,8 +22,11 @@ def index(request):
                 data["isError"] = True
                 data["textError"] += ["TICK состоит только из латинских букв"]
             priceRUB = request.POST.get("priceRUB")
+            target = request.POST.get("target")
+            stop = request.POST.get("stop")
+            reasonBuy = request.POST.get("reasonBuy")
             amount = request.POST.get("amount")
-            industry = request.POST.get("indusrty", "Без отрасли")
+            industry = request.POST.get("industry", "Без отрасли")
             dateBuying = request.POST.get("dateBuying")
             portfolio = request.POST.get("portfolio")
             portfolio = StockPortfolioModel.objects.get(user=userID, name = portfolio)
@@ -33,19 +36,18 @@ def index(request):
             if data["isError"]:
                 return render(request, "home/index.html", context=data)
             cStock = StockModel(tick=tick, priceRUB = priceRUB, amount = amount, industry=industry, dateBuying = dateBuying, 
-                                Portfolio = portfolio, user = userID)
+                                Portfolio = portfolio, user = userID, target = target, stop = stop, reasonBuy = reasonBuy)
             cStock.save()
-            UniqUserStockModel.objects.get_or_create(tick = tick, user = userID)
             return redirect(f"/portfolios/show-portfolio/{portfolio.id}")
         else:
             name = request.POST.get("portfolioName")
+            money = request.POST.get("portfolioMoney")
             try:
                 StockPortfolioModel.objects.get(name = name, user = userID)
                 data["isError"] = True
                 data["textError"] = "Портфель с таким названием уже существует"
             except:
-                cPortfolio = StockPortfolioModel(name = name, user = userID)
-                cPortfolio.save()
+                cPortfolio = StockPortfolioModel.objects.create(name = name, user = userID, money=money)
                 data["isAnyPortfolioCreated"] = True
                 return redirect(f"/portfolios/show-portfolio/{cPortfolio.id}")
     return render(request, 'home/index.html', context=data)
@@ -66,14 +68,13 @@ def sign_up(request):
 def diary(request):
     userID = getCurrentUser()
     data = {'title': "Дневник",
-            "isPosted": DiaryPostModel.objects.all().__len__() > 0}
+            "isPosted": DiaryPostModel.objects.filter(user = userID).__len__() > 0}
     if data["isPosted"]:
         data["posts"] = getAllUserPosts(userID)
     return render(request, "home/diary.html", context=data)
 
 def portfolios(request):
     userID = getCurrentUser()
-    portfolios = getUserPortfolios(userID)
     portfolios = StockPortfolioModel.objects.filter(user = userID)
     stocks = getStocksFromUserPortfolios(userID)
     portfoliosAndStocks = []
@@ -101,32 +102,35 @@ def portfolios(request):
 
 def addPost(request):
     userID = getCurrentUser()
+    userUniqStocks = set(sorted([stock.tick for stock in StockModel.objects.filter(user = userID)]))
     data = {'title': "Добавить запись",
             'form': DiaryPostForm(), 
-            'userUniqStocks': getUniqueUserStockTicks(userID),
+            "userUniqStocks": userUniqStocks,
             "isPostCreated": False,
             "textMsg": "",
             "isError": "",
             "textError": []}
     if request.method == "POST":
         stockTick = request.POST.get("uniqStocks")
-        priceOpen = request.POST.get("priceOpen")
-        priceClose = request.POST.get("priceClose")
-        priceMax = request.POST.get("priceMax")
-        priceMin = request.POST.get("priceMin")
+        priceOpen = float(request.POST.get("priceOpen"))
+        priceClose = float(request.POST.get("priceClose"))
+        priceMax = float(request.POST.get("priceMax", "NULL"))
+        priceMin = float(request.POST.get("priceMin", "NULL"))
         date = request.POST.get("date")
         post = request.POST.get("post")
-        stock = UniqUserStockModel.objects.get(tick = stockTick, user = userID)
-        cPost = DiaryPostModel(Stock = stock, priceOpen=priceOpen, priceClose=priceClose, priceMax=priceMax, priceMin = priceMin,
+        
+        cPost = DiaryPostModel(stockTick = stockTick, priceOpen=priceOpen, priceClose=priceClose, priceMax=priceMax, priceMin = priceMin,
                        date = date, msg=post, user = userID)
         data["isPostCreated"] = True
         data["textMsg"] = stockTick
-        if min(priceMin, priceClose, priceMax, priceOpen) != priceMin:
-            data["isError"] = True
-            data["textError"] += ["Минимальная цена должна быть меньше всех цен за день"]
-        if max(priceMin, priceClose, priceMax, priceOpen) != priceMax:
-            data["isError"] = True
-            data["textError"] += ["Максимальная цена должна быть больше всех цен за день"]
+        if priceMin != "NULL":
+            if min(priceMin, priceClose, priceMax, priceOpen) != priceMin:
+                data["isError"] = True
+                data["textError"] += ["Минимальная цена должна быть меньше всех цен за день"]
+        if priceMax != "NULL":
+            if max(priceMin, priceClose, priceMax, priceOpen) != priceMax:
+                data["isError"] = True
+                data["textError"] += ["Максимальная цена должна быть больше всех цен за день"]
         if not data["isError"]:
             cPost.save()
     return render(request, "home/add-post.html", context=data)
@@ -138,31 +142,56 @@ def editStockPage(request, id):
     data = {"stock": stock,
             "title": "Редактировать акцию",
             "form": EditStockForm(),
-            "userPortfolios": getUserPortfolios(userID),
+            "userPortfolios": StockPortfolioModel.objects.filter(user = userID),
             "isError": False,
             "textError": [],
             "date" : str(stock.dateBuying)}
     if stock.user == userID:
         if request.method == "POST":
-            cTick = stock.tick
             stock.tick = request.POST.get("tick").upper()
 
             priceRUB = request.POST.get('priceRUB').replace(",", ".")
             try:
                 priceRUB = float(priceRUB)
                 if priceRUB < 0:
-                    raise ValueError
+                    raise KeyError
                 stock.priceRUB = priceRUB
-                
-            except ValueError:
+            except KeyError:
                 data["isError"] = True
                 data["textError"] += ["Значение цены должно быть положительным"]
             except:
                 data["isError"] = True
                 data["textError"] += ["В поле цены необходимо ввести число."]
+
+            target = request.POST.get('target').replace(",", ".")
+            try:
+                target = float(target)
+                if target < 0:
+                    raise KeyError
+                stock.target = target
+            except KeyError:
+                data["isError"] = True
+                data["textError"] += ["Значение цели должно быть положительным"]
+            except:
+                data["isError"] = True
+                data["textError"] += ["В поле цели необходимо ввести число."]
+
+            stop = request.POST.get('stop').replace(",", ".")
+            try:
+                stop = float(stop)
+                if stop < 0:
+                    raise KeyError
+                stock.stop = stop
+            except KeyError:
+                data["isError"] = True
+                data["textError"] += ["Значение стоп приказа должно быть положительным"]
+            except:
+                data["isError"] = True
+                data["textError"] += ["В поле стоп приказа необходимо ввести число."]  
+
             amount = request.POST.get("amount")
             if int(amount) == float(amount):
-                stock.amount = amount
+                stock.amount = int(amount)
             else:
                 data["isError"] = True
                 data["textError"] += ["Значение количества акций должно быть натуральным"]
@@ -184,9 +213,8 @@ def editStockPage(request, id):
                 data["textError"] += ["Невозможно добавить в портфель данную акцию, т.к. в нем не хватает свободных средств"]
             if data["isError"]:
                 return render(request, "home/edit-stock.html", context=data)
+            stock.reasonBuy = request.POST.get("reasonBuy")
             stock.save()
-            delUniqStock(cTick, UserID=userID)
-            addUniqStock(stock.tick, UserID = userID)
             return redirect("/portfolios")     
     else:
         return redirect("/portfolios")       
@@ -197,9 +225,7 @@ def deleteStockPage(request, id):
     userID = getCurrentUser()
     cStock = StockModel.objects.get(id=id)
     if cStock.user == userID:
-        deleteStock(id)
-
-    # ДОБАВИТЬ ДОБАВЛЕНИЕ В ИСТОРИЮ
+        cStock.delete()
 
     return redirect("/portfolios")
 
@@ -245,8 +271,67 @@ def showPortfolioPage(request, id):
                 portfolio.money = portfolioMoney
                 portfolio.name = portfolioName
                 portfolio.save()
-                return redirect(f"/portfolios/show-post/{portfolio.id}")
+                return redirect(f"/portfolios/show-portfolio/{portfolio.id}")
 
         return render(request, "home/show-portfolio.html", context=data)
     else:
         return redirect("/")
+
+
+def historyPage(request):
+    userID = getCurrentUser()
+    stocks = HistoryModel.objects.filter(user = userID)
+    stocks = [[stock, getSoldStockInfo(stock)] for stock in stocks]
+    data = {"title": "История",
+            "stocks": stocks}
+    return render(request, "home/history.html", context=data)
+
+
+def showStockPage(request, id):
+    userID = getCurrentUser()
+    stock = StockModel.objects.get(id = id)
+    info = getStockInfo(stock, 0.003)
+    data = {"title": stock.tick,
+            "stockInfo": info,
+            "stock": stock,
+            "sellForm": SellStockForm,
+            "isError": False,
+            "textError": []}
+    if request.method == "POST":
+        priceSell = float(request.POST.get("priceSell"))
+        amountSell = int(request.POST.get("amountSell"))
+        
+        if amountSell > stock.amount:
+            data["isError"] = True
+            data["textError"] += ["Количество продажи должно быть меньше количества текущей акции"]
+        
+        reasonSell = request.POST.get("reasonSell")
+        if data["isError"]:
+            return render(request, "home/show-stock.html", context=data)
+
+        cHistoryStock = HistoryModel(tick = stock.tick, priceBuy = stock.priceRUB, 
+                                    priceSell = priceSell, reasonSell = reasonSell,
+                                    reasonBuy = stock.reasonBuy, dateBuy = stock.dateBuying,
+                                    dateSell = datetime.date.today(), industry = stock.industry,
+                                    portfolio = stock.Portfolio, amountSell = amountSell,
+                                    user = userID)
+        cHistoryStock.save()
+        info = getSoldStockInfo(cHistoryStock)
+        stock.Portfolio.money += info["finalTotal"]
+        stock.Portfolio.save()
+        if amountSell < stock.amount:
+            stock.amount -= amountSell
+            stock.save()
+            
+        else:
+            return redirect(f"/delete/{stock.id}")
+        return redirect(f"/show-stock/{stock.id}")
+    return render(request, "home/show-stock.html", context=data)
+
+
+def deleteSoldStock(request, id):
+    userID = getCurrentUser()
+    stock = HistoryModel.objects.get(id = id)
+    if stock.user == userID:
+        stock.delete()
+    return redirect("/history")

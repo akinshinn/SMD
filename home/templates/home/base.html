@@ -19,6 +19,7 @@
             <li class="nav-item"><a href="{% url 'home' %}" class="nav-link link-body-emphasis px-2">Главная</a></li>
             <li class="nav-item"><a href="{% url 'diary' %}" class="nav-link link-body-emphasis px-2">Мой Дневник</a></li>
             <li class="nav-item"><a href="{% url 'portfolios' %}" class="nav-link link-body-emphasis px-2">Портфели</a></li>
+            <li class="nav-item"><a href="{% url 'history' %}" class="nav-link link-body-emphasis px-2">История</a></li>
             <li class="nav-item"><a href="{% url 'about' %}" class="nav-link link-body-emphasis px-2">О проекте</a></li>
             </ul>
             <ul class="nav">
@@ -28,7 +29,9 @@
         </div>
     </nav>
     {% endblock header %}
-    {% block content %} {% endblock content %}
+    {% block content %} 
+    {% endblock content %}
+    
 </body>
 
 </html>
