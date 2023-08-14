@@ -4,7 +4,6 @@
 <div class="container">
     <div class="row">
         <div class="col-10">
-            <h3>{{stock.tick}}</h3>
             {% for textErr in textError %}
             <br>
             <div class="alert  alert-dismissible fade show" role="alert" style="border: 1px solid;">
@@ -26,6 +25,16 @@
                     <p>Стоп приказ в процентах: {{stockInfo.risksPercent | floatformat}} %</p>
                     <p>Риск: {{stockInfo.risk}} руб./акция</p>
                     <p>Профит: {{stockInfo.profit}} руб./акция</p>
+                    
+                    <p>Отношение риск/прибыль: 
+                        {% if stockInfo.riskToProfit < 0.33 %}
+                        <span class="text-success">{{stockInfo.riskToProfit | floatformat}}</span>
+                        {% else %}
+                        <span class="text-danger">{{stockInfo.riskToProfit | floatformat}}</span>
+                        {%endif%}
+                         руб.
+                    </p>
+
                     <p>Проскальзывание: {{stockInfo.slippage}} руб.</p>
                     <p>Максимальные комиссионные: {{stockInfo.commissionMax}} руб.</p>
                     <p>Минимальные комиссионные: {{stockInfo.commissionMin}} руб.</p>

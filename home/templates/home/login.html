@@ -1,4 +1,35 @@
 {% extends 'home/base.html' %}
 {% block content %}
-
+    <div>
+        <div class="container">
+            <div class="row">
+                <div class="col-6 mycontainer mx-auto">
+    
+                    <form method="POST">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                          <label for="" class="form-label">Логин</label>
+                          {{form.username}}
+                        </div>
+                        <div class="mb-3">
+                          <label for="" class="form-label">Пароль</label>
+                          {{form.password}}
+                        </div>
+                        <div class="container">
+                            <div class="row">
+                                <div class="d-flex justify-content-end col-12">
+                                    <a href="/forgot-password" class="mylink" style="color: grey;">Забыли пароль?</a>
+                                </div>
+            
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-success">Войти</button>
+                    </form>
+                    <br>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+    
 {% endblock content %}

@@ -3,12 +3,102 @@
     <div class="container">
         <div class="row">
             <div class="col-10">
-                First Column
+                <p>Ваш логин для входа на сайт: {{user.username}}</p>
+                {% if user.first_name %}
+                <p>Ваше имя: {{user.first_name}}</p>
+                {% endif %}
+                <p>Ваша эл. почта: {{user.email}}</p>
+                <p>У вас <a href="/portfolios" class="mylink">{{portfolios | length}} портфелей</a></p>
+                {% if portfolios%}
+                <p>Все деньги в портфелях: {{stats.sumPortfolios | floatformat}} руб.</p>
+                <p>Доходность всех портфелей за месяц: 
+                    {% if stats.totalMonthPortfolio > 0 %}
+                        <span class="text-success">{{stats.totalMonthPortfolio | floatformat}} ({{stats.totalMonthPercent | floatformat}}%)</span>
+                    {% elif stats.totalMonthPortfolio < 0 %}
+                    <span class="text-danger">{{stats.totalMonthPortfolio | floatformat}} ({{stats.totalMonthPercent | floatformat}}%)</span>
+                    {% else %}
+                    <span class="text-warning">{{stats.totalMonthPortfolio | floatformat}} ({{stats.totalMonthPercent | floatformat}}%)</span>
+                    {% endif %}
+                    руб.
+                </p>
+                <p>Доходность всех портфелей за год: 
+                    {% if stats.totalYearPortfolio > 0 %}
+                        <span class="text-success">{{stats.totalYearPortfolio | floatformat}} ({{stats.totalYearPercent | floatformat}}%)</span>
+                    {% elif stats.totalYearPortfolio < 0 %}
+                    <span class="text-danger">{{stats.totalYearPortfolio | floatformat}} ({{stats.totalMonthPercent | floatformat}}%)</span>
+                    {% else %}
+                    <span class="text-warning">{{stats.totalYearPortfolio | floatformat}} ({{stats.totalYearPercent | floatformat}}%)</span>
+                    {% endif %}
+                    руб.
+                </p>
+                {%endif%}
+                <p>На проекте с {{user.date_joined}}</p>
+                <button type="button" class="btn btn-secondary btn-md" data-bs-toggle="modal" data-bs-target="#modalId">
+                    Редактировать данные
+                </button>
+                <a class="btn btn-secondary" href={% url 'changePassword' %}>Сменить пароль</a>
             </div>
-            <div class="col-2">
-                Second Column
-            </div>
-            
         </div>
     </div>
+
+
+    
+    <!-- Modal -->
+    <div class="modal fade" id="modalId" tabindex="-1" role="dialog" aria-labelledby="modalTitleId" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                    <div class="modal-header">
+                            <h5 class="modal-title" id="modalTitleId">Редактировать профиль</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                <form method="POST">
+                
+                <div class="modal-body">
+                    <div class="container-fluid">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                              <label for="" class="form-label">{{form.username.label}}</label>
+                              <input type="text"
+                                    class="form-control form-control-sm" name="username" id="username" 
+                                    aria-describedby="helpId" placeholder=""
+                                    value={{user.username}}>
+                            </div>
+                            <div class="mb-3">
+                                <label for="" class="form-label">{{form.email.label}}</label>
+                                <input type="text"
+                                    class="form-control form-control-sm" name="email" id="email" 
+                                    aria-describedby="helpId" placeholder=""
+                                    value={{user.email}}>
+                              </div>
+                            <div class="mb-3">
+                                <label for="" class="form-label">{{form.first_name.label}}</label>
+                                <input type="text"
+                                    class="form-control form-control-sm" name="first_name" id="first_name" 
+                                    aria-describedby="helpId" placeholder=""
+                                    value={{user.first_name}}>
+                            </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-secondary">Сохранить</button>
+                </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        var modalId = document.getElementById('modalId');
+    
+        modalId.addEventListener('show.bs.modal', function (event) {
+              // Button that triggered the modal
+              let button = event.relatedTarget;
+              // Extract info from data-bs-* attributes
+              let recipient = button.getAttribute('data-bs-whatever');
+    
+            // Use above variables to manipulate the DOM
+        });
+    </script>
+    
 {% endblock content %}

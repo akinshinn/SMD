@@ -1,7 +1,8 @@
 from django import forms
-from .StockPortfolio import Stock, StockPortfolio
+from .models import *
 import datetime
-
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import User
 class StockForm(forms.Form):
     attrs = {"class": "form-control form-control-sm", 
              "aria-describedby": 'helpId'}
@@ -91,3 +92,42 @@ class SellStockForm(forms.Form):
     attrs["rows"] = 4
     reasonSell = forms.CharField(max_length=1000, required=True, label="Причина продажи",
                                  widget=forms.Textarea(attrs=attrs))
+    
+
+class UserRegistrationForm(forms.ModelForm):
+    password = forms.CharField(label='Пароль', widget=forms.PasswordInput(attrs={"class": "form-control form-control-sm"}))
+    password2 = forms.CharField(label='Повторите пароль', widget=forms.PasswordInput(attrs={"class": "form-control form-control-sm"}))
+
+    class Meta:
+        # attrs = {"class": "form-control form-control-sm"}
+        model = User
+        fields = ('username', 'email')
+        widgets = {
+            "username": forms.TextInput(
+                                        attrs={"class": "form-control form-control-sm"}, 
+                                        ),
+            "email": forms.TextInput(
+                                     attrs={"class": "form-control form-control-sm"}, 
+                                     )
+        }
+    def clean_password2(self):
+        cd = self.cleaned_data
+        if cd['password'] != cd['password2']:
+            raise forms.ValidationError('Passwords don\'t match.')
+        return cd['password2']
+
+
+class LoginForm(forms.Form):
+    username = forms.CharField(label="Имя пользователя", widget=forms.TextInput(attrs={"class": "form-control form-control-sm"}))
+    password = forms.CharField(label='Пароль', widget=forms.PasswordInput(attrs={"class": "form-control form-control-sm"}))
+
+
+class EditProfileForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ('username', 'email', 'first_name')
+        widgets = {
+            "username": forms.TextInput(attrs={"class": "form-control form-control-sm"}),
+            "email": forms.TextInput(attrs={"class": "form-control form-control-sm"}),
+            "first_name": forms.TextInput(attrs={"class": "form-control form-control-sm"})
+        }

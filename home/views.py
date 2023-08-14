@@ -2,13 +2,17 @@ from django.shortcuts import render, redirect
 from .forms import *
 from .models import *
 from .operationsWithModels import *
-from datetime import date
 from django.core.exceptions import ObjectDoesNotExist
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import logout, authenticate, login
+from django.contrib.auth.models import User
 
-
+@login_required
 def index(request):
-    userID = getCurrentUser()
+    userID = getCurrentUser(request)
     data = {'title': "SMD",
+            "titlePage": "Главная",
             "portfolioForm": StockPortfolioForm(), "stockForm": StockForm(),
             "isAnyPortfolioCreated": StockPortfolioModel.objects.all().__len__() > 0,
             "userPortfolios": StockPortfolioModel.objects.filter(user = userID),
@@ -52,35 +56,86 @@ def index(request):
                 return redirect(f"/portfolios/show-portfolio/{cPortfolio.id}")
     return render(request, 'home/index.html', context=data)
 
+@login_required
 def profile(request):
-    return render(request, 'home/profile.html')
+    user = request.user
+    form = EditProfileForm()
+    data = {"title": user.username,
+            "titlePage": user.username if not user.first_name else user.first_name,
+            "portfolios": StockPortfolioModel.objects.filter(user = user.id),
+            "stats": getStatsAllPortfolios(StockPortfolioModel.objects.filter(user = user.id)) if StockPortfolioModel.objects.filter(user = user.id) else None}
+    if request.method == "POST":
+        user.username = request.POST.get("username")
+        user.email = request.POST.get("email")
+        user.first_name = request.POST.get("first_name")
+        user.save()
+        return redirect("/profile")
+    else:         
+        data["form"] = form
+    return render(request, 'home/profile.html', context=data)
 
 def about(request):
-    return render(request, 'home/about.html')
+    data = {
+        "title": "О проекте",
+        "titlePage": "О проекте"
+    }
+    return render(request, 'home/about.html', context=data)
 
-def login(request):
-    return render(request, 'home/login.html')
+def logout_request(request):
+    logout(request)
+    return redirect("/login")
+
+def login_request(request):
+    data = {"title": "Войти",
+            "titlePage": "Войти",}
+    form = LoginForm()
+    if request.method == "POST":
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+        user = authenticate(request, username=username, password=password)
+        if user:
+            login(request, user)
+            return redirect("/")
+    data["form"] = form
+    return render(request, 'home/login.html', context=data)
+
 
 def sign_up(request):
-    data = {"title": "Зарегистрироваться"}
+    data = {"title": "Зарегистрироваться",
+            "titlePage": "Зарегистрироваться"}
+    if request.method == "POST":
+        form = UserRegistrationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            user.set_password(form.cleaned_data["password"])
+            user.save()
+            return redirect("/")
+    else: 
+        form = UserRegistrationForm()
+    data["form"] = form
+    
     return render(request, "home/sign-up.html", context=data)
 
+@login_required
 def diary(request):
-    userID = getCurrentUser()
+    userID = getCurrentUser(request)
     data = {'title': "Дневник",
+            "titlePage": "Ваш Дневник",
             "isPosted": DiaryPostModel.objects.filter(user = userID).__len__() > 0}
     if data["isPosted"]:
         data["posts"] = getAllUserPosts(userID)
     return render(request, "home/diary.html", context=data)
 
+@login_required
 def portfolios(request):
-    userID = getCurrentUser()
+    userID = getCurrentUser(request)
     portfolios = StockPortfolioModel.objects.filter(user = userID)
     stocks = getStocksFromUserPortfolios(userID)
     portfoliosAndStocks = []
     for portfolio in portfolios:
         portfoliosAndStocks += [[[portfolio.name, portfolio.id, portfolio.money], getPortfolioStats(portfolio), stocks[portfolio.id]]]
     data = {'title': "Портфели",
+            "titlePage": "Ваши портфели",
             "portfolios": portfolios,
             "portfoliosAndStocks": portfoliosAndStocks,
             "portfolioForm": StockPortfolioForm,
@@ -100,10 +155,12 @@ def portfolios(request):
             
     return render(request, "home/portfolios.html", context=data)
 
+@login_required
 def addPost(request):
-    userID = getCurrentUser()
+    userID = getCurrentUser(request)
     userUniqStocks = set(sorted([stock.tick for stock in StockModel.objects.filter(user = userID)]))
     data = {'title': "Добавить запись",
+            "titlePage": "Добавить запись",
             'form': DiaryPostForm(), 
             "userUniqStocks": userUniqStocks,
             "isPostCreated": False,
@@ -135,13 +192,15 @@ def addPost(request):
             cPost.save()
     return render(request, "home/add-post.html", context=data)
 
+@login_required
 def editStockPage(request, id):
-    userID = getCurrentUser()
+    userID = getCurrentUser(request)
     stock = StockModel.objects.get(id = id)
 
     data = {"stock": stock,
             "title": "Редактировать акцию",
-            "form": EditStockForm(),
+            "titlePage": "Редактировать акцию",
+            "form": EditStockForm(request.POST),
             "userPortfolios": StockPortfolioModel.objects.filter(user = userID),
             "isError": False,
             "textError": [],
@@ -221,28 +280,32 @@ def editStockPage(request, id):
         
     return render(request, "home/edit-stock.html", context=data)
 
+@login_required
 def deleteStockPage(request, id):
-    userID = getCurrentUser()
+    userID = getCurrentUser(request)
     cStock = StockModel.objects.get(id=id)
     if cStock.user == userID:
         cStock.delete()
 
     return redirect("/portfolios")
 
+@login_required
 def deletePortfolioPage(request, id):
-    userID = getCurrentUser()
+    userID = getCurrentUser(request)
     cPortfolio = StockPortfolioModel.objects.get(id = id)
     if cPortfolio.user == userID:
         cPortfolio.delete()
     return redirect("/portfolios")
 
+@login_required
 def showPortfolioPage(request, id):
-    userID = getCurrentUser()
+    userID = getCurrentUser(request)
     portfolio = StockPortfolioModel.objects.get(id = id)
     stocks = StockModel.objects.filter(Portfolio = portfolio)
     if userID == portfolio.user:
         data = {"portfolio": portfolio,
                 "title": portfolio.name,
+                "titlePage": portfolio.name,
                 "portfolioStats": getPortfolioStats(portfolio),
                 "portfolio": portfolio,
                 "stocks": stocks,
@@ -277,21 +340,23 @@ def showPortfolioPage(request, id):
     else:
         return redirect("/")
 
-
+@login_required
 def historyPage(request):
-    userID = getCurrentUser()
-    stocks = HistoryModel.objects.filter(user = userID)
+    userID = getCurrentUser(request)
+    stocks = HistoryModel.objects.filter(user = userID).order_by("-dateSell")
     stocks = [[stock, getSoldStockInfo(stock)] for stock in stocks]
     data = {"title": "История",
+            "titlePage": "История сделок",
             "stocks": stocks}
     return render(request, "home/history.html", context=data)
 
-
+@login_required
 def showStockPage(request, id):
-    userID = getCurrentUser()
+    userID = getCurrentUser(request)
     stock = StockModel.objects.get(id = id)
     info = getStockInfo(stock, 0.003)
     data = {"title": stock.tick,
+            "titlePage": stock.tick,
             "stockInfo": info,
             "stock": stock,
             "sellForm": SellStockForm,
@@ -328,10 +393,37 @@ def showStockPage(request, id):
         return redirect(f"/show-stock/{stock.id}")
     return render(request, "home/show-stock.html", context=data)
 
-
+@login_required
 def deleteSoldStock(request, id):
-    userID = getCurrentUser()
+    userID = getCurrentUser(request)
     stock = HistoryModel.objects.get(id = id)
     if stock.user == userID:
         stock.delete()
     return redirect("/history")
+
+@login_required
+def change_password(request):
+    userID = getCurrentUser(request)
+    user = User.objects.get(id = userID)
+
+    data = {"title": "Сменить пароль",
+            "titlePage": "Сменить пароль",
+            "errors": [],
+            "success": ""}
+    if request.method == "POST":
+        oldPassword = request.POST.get("oldPassword")
+        if user.check_password(oldPassword):
+            password1 = request.POST.get("password1")
+            password2 = request.POST.get("password2")
+            print(password1)
+            if password1 == password2 and password1:
+                user.set_password(password1)
+                user.save()
+                data["success"] = ["Пароль успешно изменён!"]
+            else:
+                data["errors"] += ["Новый пароль не совпадает с подтверждением"]
+        else:
+            data["errors"] += ["Введеный пароль не совпадает с текущим"]
+    return render(request, "home/change-password.html", context=data)
+
+

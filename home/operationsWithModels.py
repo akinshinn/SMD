@@ -27,8 +27,8 @@ def getAllUserPosts(UserID):
     return posts
 
 
-def getCurrentUser():
-    return 1
+def getCurrentUser(request):
+    return request.user.id
 
 
 def getReservedMoneyPortfolio(userID, portfolio):
@@ -92,7 +92,8 @@ def getStockInfo(stock, commission = 0.003):
               "profit": profit,
               "portfolioPercent": stock.amount * stock.priceRUB / stock.Portfolio.money * 100,
               "maxLoss": -commissionMin + risk*stock.amount,
-              "maxProfit": -commissionMax + profit*stock.amount}
+              "maxProfit": -commissionMax + profit*stock.amount,
+              "riskToProfit": abs(risk/profit)}
     return result
 
 
@@ -103,4 +104,22 @@ def getSoldStockInfo(stock, commission = 0.003):
     result = {"total": total,
               "totalPerStock": totalPerStock,
               "finalTotal": finalTotal,}
+    return result
+
+
+def getStatsAllPortfolios(portfolios):
+    sumPortfolios = 0
+    diffMonthPortfolio = 0
+    diffYearPortfolio = 0 
+
+    for portfolio in portfolios:
+        stats = getPortfolioStats(portfolio)
+        sumPortfolios += portfolio.money
+        diffMonthPortfolio += stats["totalMonth"]
+        diffYearPortfolio += stats["totalYear"]
+    result = {"totalMonthPortfolio": diffMonthPortfolio,
+              "totalYearPortfolio": diffYearPortfolio,
+              "totalMonthPercent": diffMonthPortfolio / sumPortfolios * 100,
+              "totalYearPercent": diffYearPortfolio / sumPortfolios * 100,
+              "sumPortfolios": sumPortfolios}
     return result

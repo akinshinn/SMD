@@ -1,4 +1,28 @@
 {% extends 'home/base.html' %}
 {% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-6 mx-auto mycontainer">
+            {{form.errors}}
+            <form method="POST">
+                {% csrf_token %}
+                {% for field in form %}
+                <div class="mb-3">
+                  <label for="" class="form-label">{{field.label}}</label>
+                  <br>
+                  {{field}}
+                </div>
+                
+
+                {% endfor %}
+                
+                <button type="submit" class="btn btn-success btn-md">Зарегистрироваться</button>
+            </form>
+            <br>
+        </div>
+        
+    </div>
+</div>
+    
 
 {% endblock content %}

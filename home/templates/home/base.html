@@ -23,15 +23,34 @@
             <li class="nav-item"><a href="{% url 'about' %}" class="nav-link link-body-emphasis px-2">О проекте</a></li>
             </ul>
             <ul class="nav">
+            {% if request.user.is_authenticated %}
+            {% if user.first_name %}
+            <li class="nav-item"><a href="{% url 'profile' %}" class="nav-link link-body-emphasis px-2">{{request.user.first_name}}</a></li>
+            {%else%}
+            <li class="nav-item"><a href="{% url 'profile' %}" class="nav-link link-body-emphasis px-2">{{request.user.username}}</a></li>
+            {%endif%}
+            <li class="nav-item"><a href="{% url 'logout' %}" class="nav-link link-body-emphasis px-2">Выйти</a></li>
+            {% else %}
             <li class="nav-item"><a href="{% url 'login' %}" class="nav-link link-body-emphasis px-2">Войти</a></li>
             <li class="nav-item"><a href="{% url 'sign-up' %}" class="nav-link link-body-emphasis px-2">Зарегистрироваться</a></li>
+            {% endif %}
             </ul>
         </div>
     </nav>
     {% endblock header %}
+    {% block title %}
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <h3>{{titlePage}}</h3>
+                <hr>
+
+            </div>        
+        </div>
+    </div>
+    {% endblock title %}
     {% block content %} 
     {% endblock content %}
-    
 </body>
 
 </html>

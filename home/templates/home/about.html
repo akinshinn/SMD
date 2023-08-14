@@ -1,4 +1,44 @@
 {% extends 'home/base.html' %}
+{% load static %}
 {% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-8 mx-auto">
+            <h5>Проект</h5>
+            <p>
+                Проект Stock Market Diary (SMD) создан исключительно в обучающих целях. Код проекта можно найти на 
+                
+                <strong> <a href="https://github.com/akinshinn/SMD" class="mylink">github</a></strong>. 
+                Цель проекта заключается в облегчении жизни людям, которые
+                хотят следить за рынком акций (или же криптовалюты), анализировать его и записывать свои мысли по каждому тикеру. Также
+                SMD помогает вести анализ собственных сделок, благодаря автоматическому подсчету статистических данных по сделке и портфелю.
+                Идеи и обновления проекта можно увидеть на доске <strong><a href="https://trello.com/b/FmQSffVL/smd" class="mylink">trello</a> </strong>
+            </p>
+            <hr>
+            <h5>Автор</h5>
+            <p>Акиньшин Никита, студент МГТУ им. Н. Э. Баумана факультета ФН.  <br>
+                <div>
+                    <img src="{% static "img/github.png" %}" style="width: 25px; height: 25px;">
+                <a class="mylink" href="https://github.com/akinshinn">Github</a>
+                </div>
+            </p>
+            <hr>
+            <h5>Обратная связь</h5>
+            <p>
+                Email для связи: akinshinn665@gmail.com
+                <div>
+                    <img src="{% static "img/telegram.png" %}" style="width: 25px; height: 25px;">
+                    
+                    <a class="mylink" href="https://t.me/akinshinn">Telegram: @akinshinn</a> <br>
+                </div>
+                <div>
+                    <img src="{% static "img/github.png" %}" style="width: 25px; height: 25px;">
+                <a class="mylink" href="https://github.com/akinshinn/SMD">Github</a>
+                </div>
+            </p>
+        </div>
+        
+    </div>
+</div>
 
 {% endblock content %}

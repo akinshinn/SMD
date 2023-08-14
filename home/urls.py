@@ -6,7 +6,8 @@ urlpatterns = [
     path('', views.index, name="home"),
     path('about/', views.about, name='about'),
     path('profile/', views.profile, name='profile'),
-    path('login/', views.login, name="login"),
+    path('login/', views.login_request, name="login"),
+    path('logout/', views.logout_request, name="logout"),
     path('sign-up/', views.sign_up, name='sign-up'),
     path('diary/', views.diary, name="diary"),
     path('portfolios/', views.portfolios, name="portfolios"), 
@@ -17,5 +18,7 @@ urlpatterns = [
     path("delete-portfolio/<int:id>", views.deletePortfolioPage, name="deletePortfolio"),
     path("history", views.historyPage, name="history"),
     path("show-stock/<int:id>", views.showStockPage, name="showStock"),
-    path("delete-sold-stock/<int:id>", views.deleteSoldStock, name="deleteSoldStock")
+    path("delete-sold-stock/<int:id>", views.deleteSoldStock, name="deleteSoldStock"),
+    path('change-password/', views.change_password, name="changePassword"),
+    
 ]
