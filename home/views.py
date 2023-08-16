@@ -60,8 +60,9 @@ def index(request):
 def profile(request):
     user = request.user
     form = EditProfileForm()
+    titlePage = user.username if not user.first_name else user.first_name
     data = {"title": user.username,
-            "titlePage": user.username if not user.first_name else user.first_name,
+            "titlePage": f"Здравствуйте, {titlePage}",
             "portfolios": StockPortfolioModel.objects.filter(user = user.id),
             "stats": getStatsAllPortfolios(StockPortfolioModel.objects.filter(user = user.id)) if StockPortfolioModel.objects.filter(user = user.id) else None}
     if request.method == "POST":

@@ -23,7 +23,7 @@ def getStocksFromUserPortfolios(UserID):
 
 
 def getAllUserPosts(UserID):
-    posts = DiaryPostModel.objects.filter(user = UserID)
+    posts = DiaryPostModel.objects.filter(user = UserID).order_by("-date")
     return posts
 
 

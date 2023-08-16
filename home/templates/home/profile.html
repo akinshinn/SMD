@@ -2,7 +2,7 @@
 {% block content %}
     <div class="container">
         <div class="row">
-            <div class="col-10">
+            <div class="col-10 card mx-auto">
                 <p>Ваш логин для входа на сайт: {{user.username}}</p>
                 {% if user.first_name %}
                 <p>Ваше имя: {{user.first_name}}</p>
@@ -33,10 +33,22 @@
                 </p>
                 {%endif%}
                 <p>На проекте с {{user.date_joined}}</p>
-                <button type="button" class="btn btn-secondary btn-md" data-bs-toggle="modal" data-bs-target="#modalId">
-                    Редактировать данные
-                </button>
-                <a class="btn btn-secondary" href={% url 'changePassword' %}>Сменить пароль</a>
+                <div class="container">
+                    <div class="row">
+                        <div class="col-5">
+                            <button type="button" class="btn btn-secondary btn-md" data-bs-toggle="modal" data-bs-target="#modalId">
+                                Редактировать данные
+                            </button>
+                            <a class="btn btn-secondary" href={% url 'changePassword' %}>Сменить пароль</a>
+
+                        </div>
+                        <div class="col-5">
+                        </div>
+                        
+                    </div>
+                </div>
+               
+                
             </div>
         </div>
     </div>

@@ -15,7 +15,7 @@
                 {% for portfolio, portfolioStats, stocks in portfoliosAndStocks %}
                     <div class="container">
                         <div class="row">
-                            <div class="col-10 mx-auto" style="border: 1px solid; border-radius: 5px;">
+                            <div class="col-10 mx-auto">
                                 
                                 <h5>Название: <a href="show-portfolio/{{portfolio.1}}" class="mylink">{{portfolio.0}}</a></h5>
                                 {% if portfolioStats.totalMonth > 0 %}
@@ -70,34 +70,39 @@
                                     </p>
                                     {%endif%}
                                 <h5>Акции:</h5>
+
                                 {% for stock in stocks %}
+
                                 <div class="container">
                                     <div class="row">
-                                        <div class="col-6 mx-auto mystock mycontainer">
-                                            <p>
-                                                TICK: <a href="/show-stock/{{stock.id}}" class="mylink">{{stock.tick}}</a> <br>
-                                                Цена: {{stock.priceRUB}} руб. <br>
-                                                Количество: {{stock.amount}} <br>
-                                                Дата покупки: {{stock.dateBuying}} <br>
-                                                Отрасль: {{stock.industry}}
-                                            </p>
-                                            <div class="container">
-                                                <div class="row">
-                                                    <div class="d-flex justify-content-end col-12">
-                                                        <a href="edit-stock/{{stock.id}}" class="mylink">редактировать</a>
-                                                    </div>
-                                
+                                        <div class="col-6 mx-auto mystock">
+                                            <div class="card">
+                                                <div class="card-body">
+                                                    <p class="card-text">TICK: <a href="/show-stock/{{stock.id}}" class="mylink">{{stock.tick}}</a> <br>
+                                                        Цена: {{stock.priceRUB}} руб. <br>
+                                                        Количество: {{stock.amount}} <br>
+                                                        Дата покупки: {{stock.dateBuying}} <br>
+                                                        Отрасль: {{stock.industry}}</p>
+                                                        <div class="container">
+                                                            <div class="row">
+                                                                <div class="d-flex justify-content-end col-12">
+                                                                    <a href="edit-stock/{{stock.id}}" class="mylink">редактировать</a>
+                                                                </div>
+                                            
+                                                            </div>
+                                                        </div>
                                                 </div>
                                             </div>
+                                            
                                         </div>
                                     </div>
                                 </div>
-                                <br>
+                                {% comment %} <br> {% endcomment %}
                                 {%endfor%}
                             </div>           
                         </div>
                     </div>
-                    <br>
+                    <hr>
                 {% endfor %}
             </div>
             {%else%}

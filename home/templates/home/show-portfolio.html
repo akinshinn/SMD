@@ -15,7 +15,7 @@
                     <div class="col-10">
                         <div class="container">
                             <div class="row">
-                                <div class="col-10  mycontainer mx-auto">
+                                <div class="col-10 mx-auto">
                                     <h5>Статистика:</h5>
                                     <p>Все средства: <strong>{{portfolio.money | floatformat}}</strong> руб.</p>
                                     <p>Свободные средства: <strong>{{portfolioStats.freeMoney | floatformat}}</strong> руб. (<strong>{{portfolioStats.percentFreeMoney | floatformat}}</strong> %)</p>
@@ -135,14 +135,7 @@
                                         {% else %}
                                         <p>В данном портфеле еще нет акций.</p>
                                         {%endif%}
-                                    <!-- Button trigger modal -->
-                                    <button type="button" class="btn btn-secondary btn-md" data-bs-toggle="modal" data-bs-target="#modalId">
-                                        Редактировать портфель
-                                    </button>
-                                    <!-- Button trigger modal -->
-                                    <button type="button" class="btn btn-secondary btn-md" data-bs-toggle="modal" data-bs-target="#modalId2">
-                                    Удалить портфель
-                                    </button>
+
                                 </div>
                             </div>
                         </div>  

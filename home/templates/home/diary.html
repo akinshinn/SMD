@@ -7,7 +7,7 @@
                     {% for post in posts %}
                     <div class="container">
                         <div class="row">
-                            <div class="col-10 mycontainer mx-auto">
+                            <div class="col-10 mx-auto">
                                 <div class="container">
                                     <div class="row">
                                         <div class="col-5">
@@ -41,11 +41,20 @@
                                         
                                     </div>
                                 </div>
+
+                                <div class="container">
+                                    <div class="row">
+                                        <div class="col-12 d-flex justify-content-end">
+                                            <a type="button" class="mylink">Редактировать</a>
+                                        </div>
+                                        
+                                    </div>
+                                </div>
                                 
                             </div>
                         </div>
                     </div>
-                    <br>
+                    <hr>
                     {%endfor%}
                             
                 {%else%}
@@ -62,7 +71,7 @@
             </div>
             <div class="col-2">
                 <br>
-                <a type="button" class="btn mybtn btn-md btn-secondary" href="{% url 'add-post' %}">
+                <a type="button" class="btn btn-md btn-secondary" href="{% url 'add-post' %}">
                     Создать запись
                 </a>
             </div> 
