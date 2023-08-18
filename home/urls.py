@@ -20,5 +20,6 @@ urlpatterns = [
     path("show-stock/<int:id>", views.showStockPage, name="showStock"),
     path("delete-sold-stock/<int:id>", views.deleteSoldStock, name="deleteSoldStock"),
     path('change-password/', views.change_password, name="changePassword"),
-    
+    path("edit-post/<int:id>", views.editPost, name="editPost"),
+    path("delete-post/<int:id>", views.deletePost, name="deletePost"),
 ]

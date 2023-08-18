@@ -22,8 +22,44 @@ def getStocksFromUserPortfolios(UserID):
     return result
 
 
-def getAllUserPosts(UserID):
-    posts = DiaryPostModel.objects.filter(user = UserID).order_by("-date")
+def getAllUserPosts(UserID, sort = None, period = None):
+    if sort:
+        # 0 - сначала старые, 1 - новые, 2 - алфавит, 3 - обратный алфавит
+        # 4- по возр цены откр, 5 - по убыв цены откр, 6 - по возр цены закр,
+        # 7 - по убыв цены закр
+        if sort == 0:
+            posts = DiaryPostModel.objects.filter(user = UserID)
+        elif sort == 1:
+            posts = DiaryPostModel.objects.filter(user = UserID).order_by("-date")
+        elif sort == 2:
+            posts = DiaryPostModel.objects.filter(user = UserID).order_by("stockTick")
+        elif sort == 3:
+            posts = DiaryPostModel.objects.filter(user = UserID).order_by("-stockTick")
+        elif sort == 4:
+            posts = DiaryPostModel.objects.filter(user = UserID).order_by("priceOpen")
+        elif sort == 5:
+            posts = DiaryPostModel.objects.filter(user = UserID).order_by("-priceOpen")
+        elif sort == 6:
+            posts = DiaryPostModel.objects.filter(user = UserID).order_by("priceClose")
+        else:
+            posts = DiaryPostModel.objects.filter(user = UserID).order_by("-priceClose")
+        if period:
+            today = datetime.date.today()
+            filtered_posts = []
+            if period == "month":
+                for post in posts:
+                    post_date = post.date
+                    if post_date.month == today.month and post_date.year == today.year:
+                        filtered_posts += [post]
+            else:
+                for post in posts:
+                    post_date = post.date
+                    if post_date.year == today.year:
+                        filtered_posts += [post]
+            return filtered_posts
+
+    else:
+        posts = posts = DiaryPostModel.objects.filter(user = UserID).order_by("-date")
     return posts
 
 
@@ -123,3 +159,15 @@ def getStatsAllPortfolios(portfolios):
               "totalYearPercent": diffYearPortfolio / sumPortfolios * 100,
               "sumPortfolios": sumPortfolios}
     return result
+
+
+def isNum(number:str):
+    # num - str
+    number = number.replace(",", ".")
+    try:
+        number = float(number)
+    except:
+        return False
+    return number
+    
+    

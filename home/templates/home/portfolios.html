@@ -70,7 +70,7 @@
                                     </p>
                                     {%endif%}
                                 <h5>Акции:</h5>
-
+                                {% if stocks %}
                                 {% for stock in stocks %}
 
                                 <div class="container">
@@ -97,8 +97,16 @@
                                         </div>
                                     </div>
                                 </div>
-                                {% comment %} <br> {% endcomment %}
                                 {%endfor%}
+                                {% else %}
+                                <div class="container">
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <p>В данном портфеле нет акций</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                {%endif%}
                             </div>           
                         </div>
                     </div>
@@ -111,7 +119,7 @@
             <div class="col-2">
                 <br>
                 <!-- Button trigger modal -->
-                <button type="button" class="btn btn-secondary btn-md" data-bs-toggle="modal" data-bs-target="#modalId">
+                <button type="button" class="btn btn-outline-success btn-md" data-bs-toggle="modal" data-bs-target="#modalId">
                 Создать портфель
                 </button>
                 
@@ -136,7 +144,7 @@
                                 </div>
                             </div>
                             <div class="modal-footer">
-                                <button type="submit" class="btn btn-secondary">Создать</button>
+                                <button type="submit" class="btn btn-outline-success btn-md">Создать</button>
                             </div>
                         </form>
             

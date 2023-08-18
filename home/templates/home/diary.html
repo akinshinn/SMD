@@ -3,60 +3,131 @@
     <div class="container">
         <div class="row">
             <div class="col-10">
-                {%if isPosted%}
-                    {% for post in posts %}
-                    <div class="container">
-                        <div class="row">
-                            <div class="col-10 mx-auto">
-                                <div class="container">
-                                    <div class="row">
-                                        <div class="col-5">
-                                            <h5>{{post.stockTick}}</h5>
-                                            <p>
-                                                Цена открытия: {{post.priceOpen}} руб.
-                                            </p>
-                                            <p>
-                                                Цена закрытия: {{post.priceClose}} руб.
-                                            </p>
-                                            {%if post.priceMin%}
-                                            <p>
-                                                Минимальная цена: {{post.priceMin}} руб.
-                                            </p>
-                                            {%endif%}
-                                            {%if post.priceMax%}
-                                            <p>
-                                                Максимальная цена: {{post.priceMax}} руб.
-                                            </p>
-                                            {%endif %}
-                                            <p>
-                                                Дата поста: {{post.date}}
-                                            </p>
-                                        </div>
-                                        <div class="col-7">
-                                            <h6>Пост:</h6>
-                                            <div class="text-wrap text-break">
-                                                {{post.msg}}
-                                            </div>
-                                        </div>
-                                        
-                                    </div>
+                <div class="container">
+                    <div class="row">
+                        <div class="col-12 card">
+                            <h5>Фильтр</h5>
+                            <form method="POST">
+                                {% csrf_token %}
+                                <div class="mb-3">
+                                    <label for="" class="form-label">Сортировка</label>
+                                    <select class="form-select form-select-sm" name="sort" id="">
+                                        {% if sort == 0 %}
+                                        <option selected>Сортировка по дате (сначала старые)</option>
+                                        {% else %}
+                                        <option>Сортировка по дате (сначала старые)</option>
+                                        {%endif%}
+                                        {% if sort == 1 %}
+                                        <option selected>Сортировка по дате (сначала новые)</option>
+                                        {% else %}
+                                        <option>Сортировка по дате (сначала новые)</option>
+                                        {%endif%}
+                                        {% if sort == 2 %}
+                                        <option selected>Сортировка по тикеру (по алфавиту)</option>
+                                        {% else %}
+                                        <option>Сортировка по тикеру (по алфавиту)</option>
+                                        {%endif%}
+                                        {% if sort == 3 %}
+                                        <option selected>Сортировка по тикеру (по алфавиту в обратном порядке)</option>
+                                        {% else %}
+                                        <option>Сортировка по тикеру (по алфавиту в обратном порядке)</option>
+                                        {%endif%}
+                                        {% if sort == 4 %}
+                                        <option selected>Сортировка по цене открытия (по возрастанию)</option>
+                                        {% else %}
+                                        <option>Сортировка по цене открытия (по возрастанию)</option>
+                                        {%endif%}
+                                        {% if sort == 5 %}
+                                        <option selected>Сортировка по цене открытия (по убыванию)</option>
+                                        {% else %}
+                                        <option>Сортировка по цене открытия (по убыванию)</option>
+                                        {%endif%}
+                                        {% if sort == 6 %}
+                                        <option selected>Сортировка по цене закрытия (по возрастанию)</option>
+                                        {% else %}
+                                        <option>Сортировка по цене закрытия (по возрастанию)</option>
+                                        {%endif%}
+                                        {% if sort == 7 %}
+                                        <option selected>Сортировка по цене закрытия (по убыванию)</option>
+                                        {% else %}
+                                        <option>Сортировка по цене закрытия (по убыванию)</option>
+                                        {%endif%}
+                                    </select>
+                                </div>
+                                <p>Период</p>
+                                <div class="form-check form-check-inline">
+                                    {% if isMonth %}
+                                    <input class="form-check-input" type="checkbox" id="" name="month" value="True" checked>
+                                    {% else%}
+                                    <input class="form-check-input" type="checkbox" id="" name="month" value="True">
+                                    {%endif%}
+                                    <label class="form-check-label" for="">Только этот месяц</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    {% if isYear %}
+                                    <input class="form-check-input" type="checkbox" id="" name="year" value="True" checked>
+                                    {% else%}
+                                    <input class="form-check-input" type="checkbox" id="" name="year" value="True">
+                                    {%endif%}
+                                    <label class="form-check-label" for="">Только этот год</label>
                                 </div>
 
-                                <div class="container">
-                                    <div class="row">
-                                        <div class="col-12 d-flex justify-content-end">
-                                            <a type="button" class="mylink">Редактировать</a>
-                                        </div>
-                                        
-                                    </div>
+                                <button type="submit" class="btn btn-outline-primary btn-sm">Применить</button>
+
+                            </form>
+                        </div>
+                        
+                    </div>
+                </div>
+                <hr>
+
+                   
+                {%if isPosted%}
+                    {% for post in posts %}
+
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-5">
+                                <h5>{{post.stockTick}}</h5>
+                                <p>
+                                    Цена открытия: {{post.priceOpen}} руб.
+                                </p>
+                                <p>
+                                    Цена закрытия: {{post.priceClose}} руб.
+                                </p>
+                                {%if post.priceMin%}
+                                <p>
+                                    Минимальная цена: {{post.priceMin}} руб.
+                                </p>
+                                {%endif%}
+                                {%if post.priceMax%}
+                                <p>
+                                    Максимальная цена: {{post.priceMax}} руб.
+                                </p>
+                                {%endif %}
+                                <p>
+                                    Дата поста: {{post.date}}
+                                </p>
+                            </div>
+                            <div class="col-7">
+                                <h6>Пост:</h6>
+                                <div class="text-wrap text-break">
+                                    {{post.msg}}
                                 </div>
+                            </div>
+                                        
+
+
+                            <div class="col-12 d-flex justify-content-end">
+                                <a type="button" href="/edit-post/{{post.id}}" class="mylink">Редактировать</a>
+                            </div>
+
                                 
                             </div>
-                        </div>
                     </div>
                     <hr>
+
                     {%endfor%}
-                            
                 {%else%}
                 <div class="container">
                     <div class="row">
@@ -71,7 +142,7 @@
             </div>
             <div class="col-2">
                 <br>
-                <a type="button" class="btn btn-md btn-secondary" href="{% url 'add-post' %}">
+                <a type="button" class="btn btn-md btn-outline-success" href="{% url 'add-post' %}">
                     Создать запись
                 </a>
             </div> 

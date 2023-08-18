@@ -1,0 +1,99 @@
+{% extends 'home/base.html' %}
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-8 mx-auto">
+            {% for textErr in textError %}
+                <div class="alert  alert-dismissible fade show" role="alert" style="border: 1px solid;">
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    <strong>Ошибка</strong> {{textErr}}
+                </div>
+            {% endfor %}
+        </div>
+    
+                        
+    </div>
+</div>
+    <div class="container">
+        <div class="row">
+            <div class="col-8 card mx-auto">
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                      <label for="" class="form-label">Цена открытия</label>
+                      <input type="text" value="{{post.priceOpen}}"
+                          class="form-control form-control-sm" name="priceOpen" id="" aria-describedby="helpId" placeholder="">
+                    </div>
+                    <div class="mb-3">
+                      <label for="" class="form-label">Цена закрытия</label>
+                      <input type="text" value="{{post.priceClose}}"
+                          class="form-control form-control-sm" name="priceClose" id="" aria-describedby="helpId" placeholder="">
+                    </div>
+                    <div class="mb-3">
+                      <label for="" class="form-label">Минимальная цена</label>
+                      <input type="text" value="{{post.priceMin}}"
+                          class="form-control form-control-sm" name="priceMin" id="" aria-describedby="helpId" placeholder="">
+                    </div>
+                    <div class="mb-3"> 
+                        <label for="" class="form-label">Максимальная цена</label>
+                        <input type="text" value="{{post.priceMax}}"
+                            class="form-control form-control-sm" name="priceMax" id="" aria-describedby="helpId" placeholder="">
+                      </div>
+                      <div class="mb-3">
+                        <label for="" class="form-label">Дата</label>
+                        <input type="date" value="{{date}}"
+                            class="form-control form-control-sm" name="date" id="" aria-describedby="helpId" placeholder="">
+                      </div>
+                      <div class="mb-3">
+                        <div class="mb-3">
+                            <label for="" class="form-label">Текст записи</label>
+                          <textarea class="form-control" name="msg" id="" rows="4">{{post.msg}}</textarea>
+                        </div>
+                      </div>
+                      <button type="submit" class="btn btn-outline-success">Сохранить</button>
+                      <!-- Button trigger modal -->
+                      <button type="button" class="btn btn-outline-danger btn-md" data-bs-toggle="modal" data-bs-target="#modalId">
+                        Удалить
+                      </button>
+                      
+                      <!-- Modal -->
+                      <div class="modal fade" id="modalId" tabindex="-1" role="dialog" aria-labelledby="modalTitleId" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                    <div class="modal-header">
+                                            <h5 class="modal-title" id="modalTitleId">Удалить запись</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                <div class="modal-body">
+                                    <div class="container-fluid">
+                                        <p>Вы уверены, что хотите удалить запись. Её нельзя будет восстановить в дальнейшем.</p>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <a type="button" href="/delete-post/{{post.id}}" class="btn btn-outline-danger">Удалить</a>
+                                </div>
+                            </div>
+                        </div>
+                      </div>
+                      
+                      <script>
+                        var modalId = document.getElementById('modalId');
+                      
+                        modalId.addEventListener('show.bs.modal', function (event) {
+                              // Button that triggered the modal
+                              let button = event.relatedTarget;
+                              // Extract info from data-bs-* attributes
+                              let recipient = button.getAttribute('data-bs-whatever');
+                      
+                            // Use above variables to manipulate the DOM
+                        });
+                      </script>
+                      
+                </form>
+                <br>
+            </div>
+            
+        </div>
+    </div>
+    <br>
+{% endblock content%}

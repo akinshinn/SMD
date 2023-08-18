@@ -3,7 +3,7 @@
     <div>
         <div class="container">
             <div class="row">
-                <div class="col-6 mycontainer mx-auto">
+                <div class="col-6 card mx-auto shadow">
     
                     <form method="POST">
                         {% csrf_token %}
@@ -23,15 +23,22 @@
             
                             </div>
                         </div>
-                            
-                        <button type="submit" class="btn btn-success">Войти</button>
-
+                        
+                        <div class="container">
+                            <div class="row">
+                                <div class="col-4 mx-auto">
+                                    <div class="d-grid gap-2">
+                                        <button type="submit" class="btn btn-success">Войти</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <br>                
 
                         </div>
                     </form>
                     <br>
                 </div>
-                
             </div>
         </div>
     </div>

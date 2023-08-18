@@ -2,7 +2,7 @@
 {% block content %}
 <div class="container">
     <div class="row">
-        <div class="col-6 mx-auto mycontainer">
+        <div class="col-6 mx-auto card shadow">
             {{form.errors}}
             <form method="POST">
                 {% csrf_token %}
@@ -15,7 +15,16 @@
                 
 
                 {% endfor %}
-                <button type="submit" class="btn btn-success btn-md">Зарегистрироваться</button>
+                <div class="container">
+                    <div class="row">
+                        <div class="col-6 mx-auto">
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-success btn-md">Зарегистрироваться</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
             </form>
             <br>
         </div>

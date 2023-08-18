@@ -29,10 +29,10 @@
                                         </div>
                                         <div class="d-flex justify-content-end col-4">
                                             <!-- Button trigger modal -->
-                                            <button type="button" class="btn btn-secondary btn-md" data-bs-toggle="modal" data-bs-target="#modalId">
+                                            <button type="button" class="btn btn-outline-danger btn-md" data-bs-toggle="modal" data-bs-target="#modalId">
                                                 удалить
                                             </button>
-                                            
+                                            <br>
                                             <!-- Modal -->
                                             <div class="modal fade" id="modalId" tabindex="-1" role="dialog" aria-labelledby="modalTitleId" aria-hidden="true">
                                                 <div class="modal-dialog" role="document">
@@ -48,7 +48,7 @@
                                                             </div>
                                                         </div>
                                                         <div class="modal-footer">
-                                                            <button type="button" class="btn btn-primary">Удалить</button>
+                                                            <a type="button" href="delete-sold-stock/{{stock.id}}" class="btn btn-outline-danger">Удалить</a>
                                                         </div>
                                                     </div>
                                                 </div>

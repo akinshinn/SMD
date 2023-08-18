@@ -100,7 +100,6 @@ def login_request(request):
     data["form"] = form
     return render(request, 'home/login.html', context=data)
 
-
 def sign_up(request):
     data = {"title": "Зарегистрироваться",
             "titlePage": "Зарегистрироваться"}
@@ -124,7 +123,39 @@ def diary(request):
             "titlePage": "Ваш Дневник",
             "isPosted": DiaryPostModel.objects.filter(user = userID).__len__() > 0}
     if data["isPosted"]:
-        data["posts"] = getAllUserPosts(userID)
+        if request.method == "POST":
+            a = ["Сортировка по дате (сначала старые)", 
+                 "Сортировка по дате (сначала новые)",
+                 "Сортировка по тикеру (по алфавиту)",
+                 "Сортировка по тикеру (по алфавиту в обратном порядке)",
+                 "Сортировка по цене открытия (по возрастанию)",
+                 "Сортировка по цене открытия (по убыванию)",
+                 "Сортировка по цене закрытия (по возрастанию)",
+                 "Сортировка по цене закрытия (по убыванию)",]
+            
+            dict = {}
+            for i in range(len(a)):
+                dict[a[i]] = i
+
+            sort = request.POST.get("sort")
+
+            isMonth = request.POST.get("month")
+
+            isYear = request.POST.get("year")
+            sort = dict[sort]
+            if isMonth:
+                period = "month"
+            elif isYear:
+                period = "year"
+            else:
+                period = None
+            data["posts"] = getAllUserPosts(userID, sort, period)
+            data["isMonth"] = isMonth
+            data["isYear"] = isYear
+            data["sort"] = sort
+        else:
+            data["posts"] = getAllUserPosts(userID)
+            data["sort"] = 1
     return render(request, "home/diary.html", context=data)
 
 @login_required
@@ -427,4 +458,93 @@ def change_password(request):
             data["errors"] += ["Введеный пароль не совпадает с текущим"]
     return render(request, "home/change-password.html", context=data)
 
+@login_required
+def editPost(request, id):
+    userID = getCurrentUser(request)
+    post = DiaryPostModel.objects.get(id = id)
+    if userID == post.user:
+        data = {"title": "Редактировать запись",
+                "titlePage": "Редактировать запись",
+                "form": DiaryPostForm,
+                "post": post,
+                "date": str(post.date),
+                "textError": [],
+                "isError": False}
+        if request.method == "POST":
+            priceOpen = request.POST.get("priceOpen".replace(",", "."))
+            if isNum(priceOpen):
+                priceOpen = isNum(priceOpen)
+                post.priceOpen = priceOpen
+            else:
+                data["isError"] = True
+                data["textError"] += ["В поле цены открытия необходимо ввести число."]
+            if priceOpen <= 0:
+                data["isError"] = True
+                data["textError"] += ["Цена открытия должна быть положительной"]
 
+            priceClose = request.POST.get("priceClose".replace(",", "."))
+            if isNum(priceClose):
+                priceClose = isNum(priceClose)
+                post.priceClose = priceClose
+            else:
+                data["isError"] = True
+                data["textError"] += ["В поле цены закрытия необходимо ввести число."]
+            if priceClose <= 0:
+                data["isError"] = True
+                data["textError"] += ["Цена закрытия должна быть положительной"]
+            
+            priceMin = request.POST.get("priceMin".replace(",", "."))
+            if isNum(priceMin):
+                priceMin = isNum(priceMin)
+                post.priceMin = priceMin
+            else:
+                data["isError"] = True
+                data["textError"] += ["В поле минимальной цены необходимо ввести число."]
+            if priceMin <= 0:
+                data["isError"] = True
+                data["textError"] += ["Минимальная цена должна быть положительной"]
+            
+            priceMax = request.POST.get("priceMax".replace(",", "."))
+            if isNum(priceMax):
+                priceMax = isNum(priceMax)
+                post.priceMax = priceMax
+            else:
+                data["isError"] = True
+                data["textError"] += ["В поле максимальной цены необходимо ввести число."]
+            if priceMax <= 0:
+                data["isError"] = True
+                data["textError"] += ["Максимальной цена должна быть положительной"]
+            
+            
+            if min(priceMin, priceClose, priceMax, priceOpen) != priceMin:
+                data["isError"] = True
+                data["textError"] += ["Минимальная цена должна быть меньше всех цен за день"]
+            if max(priceMin, priceClose, priceMax, priceOpen) != priceMax:
+                data["isError"] = True
+                data["textError"] += ["Максимальная цена должна быть больше всех цен за день"]
+           
+
+            date = request.POST.get("date")
+            try:
+                date = map(int, date.split("-")) if "-" in date else map(int, date.split("."))[::-1]
+                date = datetime.date(*date)
+                post.date = date
+            except:
+                data["isError"] = True
+                data["textError"] += ["Неправильный формат даты"]
+
+            post.msg = request.POST.get("msg")
+            if not data["isError"]:
+                post.save()
+                return redirect("/diary")
+
+        return render(request, "home/edit-post.html", context=data)
+    return redirect("/diary")
+
+@login_required
+def deletePost(request, id):
+    post = DiaryPostModel.objects.get(id = id)
+    userID = getCurrentUser(request)
+    if post.user == userID:
+        post.delete()
+    return redirect("/diary")
