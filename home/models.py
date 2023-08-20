@@ -5,6 +5,7 @@ class StockPortfolioModel(models.Model):
     name = models.CharField(max_length=50)
     user = models.IntegerField()
     money = models.FloatField()
+    comission = models.FloatField()
 
 class StockModel(models.Model):
     tick = models.CharField(max_length=4)
@@ -38,6 +39,6 @@ class HistoryModel(models.Model):
     dateBuy = models.DateField()
     dateSell = models.DateField()
     industry = models.CharField(max_length=50)
-    portfolio = models.ForeignKey(StockPortfolioModel, on_delete=models.DO_NOTHING)
+    portfolio = models.ForeignKey(StockPortfolioModel, on_delete=models.CASCADE)
     amountSell = models.IntegerField()
     user = models.IntegerField()

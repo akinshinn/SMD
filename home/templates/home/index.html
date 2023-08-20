@@ -16,7 +16,6 @@
             <!-- Обработчик событий -->
             <form method="POST" autocomplete="off" action='/'>
                 {% csrf_token %}
-                    <p>Вы можете добавить акцию в портфель здесь</p>
                     <div class='container'>
                         <div class='row'>
                             <div class='col-10 mx-auto'>
@@ -27,11 +26,15 @@
                                     <br>
                                     {{ portfolioForm.portfolioMoney }}
                                     <br>
-                                    <button type="submit" class="btn btn-md" style="border: 1px solid black;">Создать</button>
+                                    {{ portfolioForm.portfolioComission }}
+                                    <br>
+                                    <button type="submit" name="portfolioAdd" class="btn btn-md btn-outline-success">Создать</button>
                                     <br>
                                 </div>
                                 
                                 {% else %}
+                    <p>Вы можете добавить акцию в портфель здесь</p>
+
                                 <div class="mb-3">
                                     <label for="tick" class="form-label">TICK</label>
                                         {{stockForm.tick}}
@@ -63,7 +66,6 @@
                                 <div class="mb-3">
                                     <label for="" class="form-label">Дата покупки</label>
                                     {{stockForm.dateBuying}}
-                                    <small id="helpId" class="form-text text-muted">Формат: YYYY-MM-DD</small>
                                 </div>    
         
                                     
@@ -79,7 +81,7 @@
                                 <label for="" class="form-label">Причина покупки</label>
                                 {{stockForm.reasonBuy}}
                                 </div>
-                                <button type="submit" class="btn btn-md center-block btn-outline-success" >Добавить</button>
+                                <button type="submit" class="btn btn-md center-block btn-outline-success" name="stockAdd" >Добавить</button>
                                 <br><br>
                                 {% endif %}
                                 

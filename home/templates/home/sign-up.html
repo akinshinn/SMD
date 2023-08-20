@@ -3,7 +3,14 @@
 <div class="container">
     <div class="row">
         <div class="col-6 mx-auto card shadow">
-            {{form.errors}}
+            {% for textErr in textError %}
+            <br>
+            <div class="alert  alert-dismissible fade show" role="alert" style="border: 1px solid;">
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        
+                <strong>Ошибка</strong> {{textErr}}
+            </div>
+            {% endfor %}
             <form method="POST">
                 {% csrf_token %}
                 {% for field in form %}

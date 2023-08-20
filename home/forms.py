@@ -1,8 +1,9 @@
 from django import forms
 from .models import *
 import datetime
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import SetPasswordForm, PasswordResetForm
 from django.contrib.auth.models import User
+from django.contrib.auth import password_validation
 class StockForm(forms.Form):
     attrs = {"class": "form-control form-control-sm", 
              "aria-describedby": 'helpId'}
@@ -18,8 +19,11 @@ class StockForm(forms.Form):
     industry = forms.CharField(required=False, label="Отрасль",
                                widget=forms.TextInput(attrs=attrs))
     attrs["value"] = datetime.date.today()
+    attrs["type"] = "date"
     dateBuying = forms.DateField(required=True, label="Дата покупки",
                                  widget=forms.DateInput(attrs=attrs))
+    attrs.pop("value")
+    attrs.pop("type")
     target = forms.FloatField(min_value=1, required=True, label="Цель", 
                                 widget=forms.NumberInput(attrs=attrs))
     stop = forms.FloatField(min_value=1, required=True, label="Стоп приказ", 
@@ -38,6 +42,9 @@ class StockPortfolioForm(forms.Form):
     attrs['placeholder'] = "Средства портфеля в рублях"
     attrs["id"] = "portfolioMoney"
     portfolioMoney = forms.FloatField(min_value=1, widget=forms.NumberInput(attrs=attrs))
+    attrs['placeholder'] = "Комиссионные брокера в процентах от сделки"
+    attrs["id"] = "portfolioComission"
+    portfolioComission = forms.FloatField(min_value=0.00000000000001, widget=forms.NumberInput(attrs=attrs))
 
 
 class DiaryPostForm(forms.Form):
@@ -131,3 +138,26 @@ class EditProfileForm(forms.ModelForm):
             "email": forms.TextInput(attrs={"class": "form-control form-control-sm"}),
             "first_name": forms.TextInput(attrs={"class": "form-control form-control-sm"})
         }
+
+
+class MyPasswordResetForm(PasswordResetForm):
+    email = forms.EmailField(
+        label=("Email"),
+        max_length=254,
+        widget=forms.EmailInput(attrs={"autocomplete": "email", "class": "form-control form-control-md", "placeholder": "Эл. почта"}),
+    )
+
+class MySetPasswordForm(SetPasswordForm):
+    new_password1 = forms.CharField(
+        label=("New password"),
+        widget=forms.PasswordInput(attrs={"autocomplete": "new-password",
+                                          "class": "form-control form-control-md"}),
+        strip=False,
+        help_text=password_validation.password_validators_help_text_html(),
+    )
+    new_password2 = forms.CharField(
+        label=("New password confirmation"),
+        strip=False,
+        widget=forms.PasswordInput(attrs={"autocomplete": "new-password",
+                                          "class": "form-control form-control-md"}),
+    )

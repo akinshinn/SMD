@@ -1,18 +1,16 @@
 {% extends 'home/base.html' %}
-{% block content %}
-
-            {% for textErr in textError %}
-                <br>
-                <div class="alert  alert-dismissible fade show" role="alert" style="border: 1px solid;">
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                
-                    <strong>Ошибка</strong> {{textErr}}
-                </div>
-            {% endfor %} 
-            
+{% block content %}          
             <div class="container">
                 <div class="row">
-                    <div class="col-10">
+                    <div class="col-8">
+                        {% for textErr in textError %}
+                            <br>
+                            <div class="alert  alert-dismissible fade show" role="alert" style="border: 1px solid;">
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            
+                                <strong>Ошибка</strong> {{textErr}}
+                            </div>
+                        {% endfor %} 
                         <div class="container">
                             <div class="row">
                                 <div class="col-10 mx-auto">
@@ -107,6 +105,16 @@
                                         <strong>{{portfolioStats.maxLossesMonth | floatformat}}</strong> 
                                         руб.
                                     </p>
+                                    <p>Комиссионные: {{portfolio.comission}} %</p>
+                                    
+                                    {% if industryPercent %}
+                                    <p>Процентное распределение портфеля по отрасли:</p>
+                                    <ul>
+                                        {% for industry, percent in industryPercent.items %}
+                                            <li>{{industry}} - <strong>{{percent | floatformat }}</strong> %</li>
+                                        {% endfor %}
+                                    </ul>
+                                    {%endif%}
                                     <h5>Акции:</h5>
                                         {% if stocks %}
                                         {% for stock in stocks %}
@@ -119,6 +127,7 @@
                                                             Количество: {{stock.amount}} <br>
                                                             Дата покупки: {{stock.dateBuying}} <br>
                                                             Отрасль: {{stock.industry}}
+                                                            
                                                         </p>
                                                         <div class="container">
                                                             <div class="row">
@@ -137,9 +146,21 @@
                                         {%endif%}
 
                                 </div>
+                                
+                                    
+                                    
+                                </div>
                             </div>
                         </div>  
                         <br><br>
+                        <div class="col-4">
+                            <button type="button" class="btn btn-outline-dark btn-md" data-bs-toggle="modal" data-bs-target="#modalId">
+                                Редактировать
+                            </button>
+                            {% comment %} <br><br> {% endcomment %}
+                            <button type="button" class="btn btn-outline-danger btn-md" data-bs-toggle="modal" data-bs-target="#modalId2">
+                                Удалить
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -155,11 +176,12 @@
                     </div>
             <div class="modal-body">
                 <div class="container-fluid">
-                    Вы дейстительно хотите удалить портфель. Его нельзя будет восстанивить, и все акции будут удалены.
+                    Вы дейстительно хотите удалить портфель? Его нельзя будет восстанивить, и все связанные с ним акции будут удалены 
+                    (в том числе и те, что хранятся в Вашей истории).
                 </div>
             </div>
             <div class="modal-footer">
-                <a href="/delete-portfolio/{{portfolio.id}}" class="btn btn-secondary">Удалить</a>
+                <a href="/delete-portfolio/{{portfolio.id}}" class="btn btn-outline-danger">Удалить</a>
             </div>
         </div>
     </div>
@@ -189,7 +211,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" class="btn btn-secondary">Сохранить</button>
+                    <button type="submit" class="btn btn-outline-success">Сохранить</button>
                 </div>
             </div>
         </div>

@@ -13,7 +13,7 @@ from django.urls import reverse_lazy
 from pathlib import Path
 import sys 
 sys.path.append("..")
-from KEY import key
+from KEY import *
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -129,3 +129,14 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_REDIRECT_URL = reverse_lazy('/')
 LOGIN_URL = reverse_lazy('login')
 LOGOUT_URL = reverse_lazy('logout')
+
+
+EMAIL_HOST = "smtp.yandex.ru"
+EMAIL_PORT = 465
+EMAIL_USE_TLS = False 
+EMAIL_USE_SSL = True
+
+
+EMAIL_HOST_USER = "aliku665@yandex.ru"
+EMAIL_HOST_PASSWORD = emailPassword
+DEFAULT_FROM_EMAIL = "aliku665@yandex.ru"

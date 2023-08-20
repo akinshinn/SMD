@@ -2,7 +2,84 @@
 {% block content %}
     <div class="container">
         <div class="row">
-            <div class="col-10">
+            <div class="col-10 mx-auto">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-12 card">
+                            <h5>Фильтр</h5>
+                            <form method="POST">
+                                {% csrf_token %}
+                                <div class="mb-3">
+                                    <label for="" class="form-label">Сортировка</label>
+                                    <select class="form-select form-select-sm" name="sort" id="">
+                                        {% if sort == 0 %}
+                                        <option selected>Дата продажи (сначала недавние)</option>
+                                        {% else %}
+                                        <option>Дата продажи (сначала недавние)</option>
+                                        {% endif %}
+                                        {% if sort == 1 %}
+                                        <option selected>Дата продажи (сначала старые)</option>
+                                        {% else %}
+                                        <option>Дата продажи (сначала старые)</option>
+                                        {% endif %}
+                                        {% if sort == 2 %}
+                                        <option selected>Дата покупки (сначала недавние)</option>
+                                        {% else %}
+                                        <option>Дата покупки (сначала недавние)</option>
+                                        {% endif %}
+                                        {% if sort == 3 %}
+                                        <option selected>Дата покупки (сначала старые)</option>
+                                        {% else %}
+                                        <option>Дата покупки (сначала старые)</option>
+                                        {% endif %}
+                                        {% if sort == 4 %}
+                                        <option selected>По портфелю</option>
+                                        {% else %}
+                                        <option>По портфелю</option>
+                                        {% endif %}
+                                        {% if sort == 5 %}
+                                        <option selected>По итогу сделки (по возрастанию)</option>
+                                        {% else %}
+                                        <option>По итогу сделки (по возрастанию)</option>
+                                        {% endif %}
+                                        {% if sort == 6 %}
+                                        <option selected>По итогу сделки (по убыванию)</option>
+                                        {% else %}
+                                        <option>По итогу сделки (по убыванию)</option>
+                                        {% endif %}
+                                        {% if sort == 7 %}
+                                        <option selected>По отрасли</option>
+                                        {% else %}
+                                        <option>По отрасли</option>
+                                        {% endif %}
+                                    </select>
+                                </div>
+                                <p>Период</p>
+                                <div class="form-check form-check-inline">
+                                    {% if isMonth %}
+                                    <input class="form-check-input" type="checkbox" id="" name="month" value="True" checked>
+                                    {% else%}
+                                    <input class="form-check-input" type="checkbox" id="" name="month" value="True">
+                                    {%endif%}
+                                    <label class="form-check-label" for="">Только этот месяц</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    {% if isYear %}
+                                    <input class="form-check-input" type="checkbox" id="" name="year" value="True" checked>
+                                    {% else%}
+                                    <input class="form-check-input" type="checkbox" id="" name="year" value="True">
+                                    {%endif%}
+                                    <label class="form-check-label" for="">Только этот год</label>
+                                </div>
+
+                                <button type="submit" class="btn btn-outline-primary btn-sm">Применить</button>
+
+                            </form>
+                        </div>
+                        
+                    </div>
+                </div>
+                <hr>
                 {% if stocks %}
                 {% for stock, info in stocks %}
                     <div class="container">

@@ -2,35 +2,49 @@ from django.shortcuts import render, redirect
 from .forms import *
 from .models import *
 from .operationsWithModels import *
-from django.core.exceptions import ObjectDoesNotExist
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout, authenticate, login
 from django.contrib.auth.models import User
+from django.contrib.auth.views import PasswordResetView, PasswordResetCompleteView, PasswordResetDoneView, PasswordResetConfirmView
 
 @login_required
 def index(request):
     userID = getCurrentUser(request)
     data = {'title': "SMD",
             "titlePage": "Главная",
-            "portfolioForm": StockPortfolioForm(), "stockForm": StockForm(),
+            "portfolioForm": StockPortfolioForm(), 
+            "stockForm": StockForm(),
             "isAnyPortfolioCreated": StockPortfolioModel.objects.all().__len__() > 0,
             "userPortfolios": StockPortfolioModel.objects.filter(user = userID),
             "isError": False,
             "textError": []}
 
     if request.method == "POST":
-        if data["isAnyPortfolioCreated"] and not request.POST.get('portfolioName'):
+        if data["isAnyPortfolioCreated"]:
             tick = request.POST.get("tick").upper()
             if not tick.isalpha():
                 data["isError"] = True
                 data["textError"] += ["TICK состоит только из латинских букв"]
             priceRUB = request.POST.get("priceRUB")
             target = request.POST.get("target")
+            if priceRUB == target:
+                data["isError"] = True
+                data["textError"] += ["Цель должна отличаться от цены покупки"]
+            
             stop = request.POST.get("stop")
+            if priceRUB == stop:
+                data["isError"] = True
+                data["textError"] += ["Стоп приказ должен отличаться от цены покупки"]
+            if stop == target:
+                data["isError"] = True
+                data["textError"] += ["Цель должна отличаться от стоп приказа"]
             reasonBuy = request.POST.get("reasonBuy")
             amount = request.POST.get("amount")
-            industry = request.POST.get("industry", "Без отрасли")
+            industry = request.POST.get("industry")
+            if industry == "":
+                industry = "Без отрасли"
             dateBuying = request.POST.get("dateBuying")
             portfolio = request.POST.get("portfolio")
             portfolio = StockPortfolioModel.objects.get(user=userID, name = portfolio)
@@ -38,6 +52,7 @@ def index(request):
                 data["isError"] = True
                 data["textError"] += [f"Вы не можете добавить данную акцию с такой ценой в портфель '{portfolio.name}', т.к. в нем не хватает свободных средств"]
             if data["isError"]:
+                data["stockForm"] = StockForm(request.POST)
                 return render(request, "home/index.html", context=data)
             cStock = StockModel(tick=tick, priceRUB = priceRUB, amount = amount, industry=industry, dateBuying = dateBuying, 
                                 Portfolio = portfolio, user = userID, target = target, stop = stop, reasonBuy = reasonBuy)
@@ -46,12 +61,13 @@ def index(request):
         else:
             name = request.POST.get("portfolioName")
             money = request.POST.get("portfolioMoney")
+            comission = request.POST.get("portfolioComission")
             try:
                 StockPortfolioModel.objects.get(name = name, user = userID)
                 data["isError"] = True
                 data["textError"] = "Портфель с таким названием уже существует"
             except:
-                cPortfolio = StockPortfolioModel.objects.create(name = name, user = userID, money=money)
+                cPortfolio = StockPortfolioModel.objects.create(name = name, user = userID, money=money, comission = comission)
                 data["isAnyPortfolioCreated"] = True
                 return redirect(f"/portfolios/show-portfolio/{cPortfolio.id}")
     return render(request, 'home/index.html', context=data)
@@ -100,11 +116,22 @@ def login_request(request):
     data["form"] = form
     return render(request, 'home/login.html', context=data)
 
-def sign_up(request):
+def sign_up(request):   
     data = {"title": "Зарегистрироваться",
-            "titlePage": "Зарегистрироваться"}
+            "titlePage": "Зарегистрироваться",
+            "isError": False,
+            "textError": []}
     if request.method == "POST":
         form = UserRegistrationForm(request.POST)
+        email = form.data["email"]
+        try:
+            User.objects.get(email = email)
+            data["isError"] = True
+            data["textError"] += ["Пользователь с данной эл. почтой уже существует"]
+            data["form"] = form
+            return render(request, "home/sign-up.html", context=data)
+        except ObjectDoesNotExist:
+            pass
         if form.is_valid():
             user = form.save()
             user.set_password(form.cleaned_data["password"])
@@ -154,7 +181,7 @@ def diary(request):
             data["isYear"] = isYear
             data["sort"] = sort
         else:
-            data["posts"] = getAllUserPosts(userID)
+            data["posts"] = getAllUserPosts(userID, 1)
             data["sort"] = 1
     return render(request, "home/diary.html", context=data)
 
@@ -176,12 +203,13 @@ def portfolios(request):
     if request.method == "POST":
         portfolioName = request.POST.get("portfolioName")
         portfolioMoney = request.POST.get("portfolioMoney")
+        portfolioComission = request.POST.get("portfolioComission")
         try: 
             StockPortfolioModel.objects.get(name = portfolioName, user = userID)
             data["isError"] = True
             data["textError"] += ["Портфель с таким названием уже существует"]
         except:
-            cPortfolio = StockPortfolioModel(name = portfolioName, user = userID, money = portfolioMoney)
+            cPortfolio = StockPortfolioModel(name = portfolioName, user = userID, money = portfolioMoney, comission = portfolioComission)
             cPortfolio.save()
             return redirect("/portfolios")
             
@@ -242,43 +270,72 @@ def editStockPage(request, id):
             stock.tick = request.POST.get("tick").upper()
 
             priceRUB = request.POST.get('priceRUB').replace(",", ".")
-            try:
-                priceRUB = float(priceRUB)
-                if priceRUB < 0:
-                    raise KeyError
+            # try:
+            #     priceRUB = float(priceRUB)
+            #     if priceRUB < 0:
+            #         raise KeyError
+            #     stock.priceRUB = priceRUB
+            # except KeyError:
+            #     data["isError"] = True
+            #     data["textError"] += ["Значение цены должно быть положительным"]
+            # except:
+            #     data["isError"] = True
+            #     data["textError"] += ["В поле цены необходимо ввести число."]
+            if isNum(priceRUB):
+                priceRUB = isNum(priceRUB)
                 stock.priceRUB = priceRUB
-            except KeyError:
+            else:
                 data["isError"] = True
-                data["textError"] += ["Значение цены должно быть положительным"]
-            except:
+                data["textError"] += ["В поле цены покупки необходимо ввести число."]
+            if priceRUB <= 0:
                 data["isError"] = True
-                data["textError"] += ["В поле цены необходимо ввести число."]
+                data["textError"] += ["Цена покупки должна быть положительной"]
 
             target = request.POST.get('target').replace(",", ".")
-            try:
-                target = float(target)
-                if target < 0:
-                    raise KeyError
+            # try:
+            #     target = float(target)
+            #     if target < 0:
+            #         raise KeyError
+            #     stock.target = target
+            # except KeyError:
+            #     data["isError"] = True
+            #     data["textError"] += ["Значение цели должно быть положительным"]
+            # except:
+            #     data["isError"] = True
+            #     data["textError"] += ["В поле цели необходимо ввести число."]
+
+            if isNum(target):
+                target = isNum(target)
                 stock.target = target
-            except KeyError:
-                data["isError"] = True
-                data["textError"] += ["Значение цели должно быть положительным"]
-            except:
+            else:
                 data["isError"] = True
                 data["textError"] += ["В поле цели необходимо ввести число."]
+            if target <= 0:
+                data["isError"] = True
+                data["textError"] += ["Цель должна быть положительной"]
 
             stop = request.POST.get('stop').replace(",", ".")
-            try:
-                stop = float(stop)
-                if stop < 0:
-                    raise KeyError
+            # try:
+            #     stop = float(stop)
+            #     if stop < 0:
+            #         raise KeyError
+            #     stock.stop = stop
+            # except KeyError:
+            #     data["isError"] = True
+            #     data["textError"] += ["Значение стоп приказа должно быть положительным"]
+            # except:
+            #     data["isError"] = True
+            #     data["textError"] += ["В поле стоп приказа необходимо ввести число."]  
+            if isNum(stop):
+                stop = isNum(stop)
                 stock.stop = stop
-            except KeyError:
+            else:
                 data["isError"] = True
-                data["textError"] += ["Значение стоп приказа должно быть положительным"]
-            except:
+                data["textError"] += ["В поле стоп-приказа  необходимо ввести число."]
+            if stop <= 0:
                 data["isError"] = True
-                data["textError"] += ["В поле стоп приказа необходимо ввести число."]  
+                data["textError"] += ["Стоп-приказ должен быть положительным"]
+
 
             amount = request.POST.get("amount")
             if int(amount) == float(amount):
@@ -343,8 +400,10 @@ def showPortfolioPage(request, id):
                 "stocks": stocks,
                 "portfolioForm": StockPortfolioForm,
                 "isError": False,
-                "textError": []}
+                "textError": [],
+                "industryPercent": getIndustryPortfolioPercentage(portfolio)}
         if request.method == "POST":
+            
             portfolioName = request.POST.get("portfolioName")
             try:
                 portfolioGet = StockPortfolioModel.objects.get(name=portfolioName)
@@ -354,14 +413,16 @@ def showPortfolioPage(request, id):
             except ObjectDoesNotExist:
                 portfolio.name = portfolioName
             portfolioMoney = request.POST.get("portfolioMoney").replace(",", ".")
-            try:
+            
+            if isNum(portfolioMoney):
                 portfolioMoney = float(portfolioMoney)
-            except:
+                if portfolioMoney < data["portfolioStats"]["ReservedMoney"] or portfolioMoney <= 0:
+                    data["isError"] = True
+                    data["textError"] += ["Сумма средств портфеля должна быть больше суммы вложенных денег"]
+            else:
                 data["isError"] = True
-                data["textError"] += ["Средствами портфеля должно быть только положительное число"]
-            if portfolioMoney < data["portfolioStats"]["ReservedMoney"] or portfolioMoney <= 0:
-                data["isError"] = True
-                data["textError"] += ["Сумма средств портфеля должна быть больше суммы вложенных денег"]
+                data["textError"] += ["Средствами портфеля должно быть число"]
+
             if not data["isError"]:
                 portfolio.money = portfolioMoney
                 portfolio.name = portfolioName
@@ -373,20 +434,52 @@ def showPortfolioPage(request, id):
         return redirect("/")
 
 @login_required
-def historyPage(request):
-    userID = getCurrentUser(request)
-    stocks = HistoryModel.objects.filter(user = userID).order_by("-dateSell")
-    stocks = [[stock, getSoldStockInfo(stock)] for stock in stocks]
+def historyPage(request):   
     data = {"title": "История",
-            "titlePage": "История сделок",
-            "stocks": stocks}
+            "titlePage": "История сделок",}
+    userID = getCurrentUser(request)
+    if request.method == "POST":
+            a = ["Дата продажи (сначала недавние)", 
+                 "Дата продажи (сначала старые)",
+                 "Дата покупки (сначала недавние)",
+                 "Дата покупки (сначала старые)",
+                 "По портфелю",
+                 "По итогу сделки (по возрастанию)",
+                 "По итогу сделки (по убыванию)",
+                 "По отрасли",]
+            
+            dict = {}
+            for i in range(len(a)):
+                dict[a[i]] = i
+
+            sort = request.POST.get("sort")
+
+            isMonth = request.POST.get("month")
+
+            isYear = request.POST.get("year")
+            sort = dict[sort]
+            if isMonth:
+                period = "month"
+            elif isYear:
+                period = "year"
+            else:
+                period = None
+            data["isMonth"] = isMonth
+            data["isYear"] = isYear
+    else:
+        sort = 0
+        period = None
+    data["sort"] = sort
+    data["stocks"] = getAllSoldStocks(userID, sort, period)
+    print(sort)
+    
     return render(request, "home/history.html", context=data)
 
 @login_required
 def showStockPage(request, id):
     userID = getCurrentUser(request)
     stock = StockModel.objects.get(id = id)
-    info = getStockInfo(stock, 0.003)
+    info = getStockInfo(stock)
     data = {"title": stock.tick,
             "titlePage": stock.tick,
             "stockInfo": info,
@@ -548,3 +641,5 @@ def deletePost(request, id):
     if post.user == userID:
         post.delete()
     return redirect("/diary")
+
+
